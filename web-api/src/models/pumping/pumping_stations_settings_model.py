@@ -1,0 +1,9 @@
+from models.abstracts.app_base_model import AppBaseModel
+from models.pumping.pumping_station_objects_model import PumpingStationObjectsModel
+from models.pumping.account_links_pumping_station_objects_model import AccountLinksPumpingStationObjectsModel
+
+
+class PumpingStationsSettingsModel(AppBaseModel):
+    pumping_station_objects: PumpingStationObjectsModel
+
+    account_links_pumping_station_objects: AccountLinksPumpingStationObjectsModel

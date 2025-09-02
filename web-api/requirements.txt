@@ -1,0 +1,7 @@
+flask==3.1.1
+flask-cors==6.0.1
+Flask-Pydantic==0.13.1
+gunicorn==23.0.0
+pyjwt==2.10.1
+pyaes==1.6.1
+pymodbus==3.11.1

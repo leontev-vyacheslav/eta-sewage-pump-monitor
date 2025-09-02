@@ -1,0 +1,19 @@
+POST http://localhost:5000/sign-in
+content-type: application/json
+
+{
+    "login": "Admin",
+    "password": "0987654321"
+}
+
+###
+
+GET http://localhost:5000/api/pumping-stations/list-by-account-id/bdc0d605-e7b9-4798-9167-65556ca069fb
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTYyMTgxMTh9.wWiCvxwSoPP1MlqEQcUpqagS0cwM4WznnYTCIDI9ukY
+X-Requested-User: Admin
+
+###
+
+GET http://localhost:5000/api/pumping-stations/state/1b2210ac-ab3a-466b-a065-1dc2a7abeac3 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTYyMTgxMTh9.wWiCvxwSoPP1MlqEQcUpqagS0cwM4WznnYTCIDI9ukY
+X-Requested-User: Admin

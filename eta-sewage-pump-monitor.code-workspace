@@ -1,0 +1,50 @@
+{
+    "folders": [
+        {
+            "name": ".workspace",
+            "path": "./"
+        },
+        {
+            "name": "web-api",
+            "path": "web-api"
+        },
+        {
+            "name": "web-ui",
+            "path": "web-ui"
+        },
+    ],
+    "settings": {
+        "python.languageServer": "Pylance",
+        "python.analysis.typeCheckingMode": "off",
+        "python.linting.pylintPath": ".venv/bin/pylint",
+        "python.linting.pylintArgs": [
+            "--disable=redefined-builtin",
+            "--disable=missing-module-docstring",
+            "--disable=missing-class-docstring",
+            "--disable=missing-function-docstring",
+            "--disable=invalid-name",
+            "--disable=logging-fstring-interpolation",
+            "--disable=bare-except",
+            "--max-line-length=140"
+        ],
+        "python.formatting.provider": "autopep8",
+        "python.formatting.autopep8Args": [
+            "--max-line-length",
+            "140",
+        ],
+        "python.testing.autoTestDiscoverOnSaveEnabled": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.cwd": "/workspaces/eta-regulator-board/web-api/src/tests",
+        "python.testing.pytestArgs": [],
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter",
+            "editor.rulers": [
+                140
+            ],
+            "editor.foldingHighlight": true,
+        },
+        "svg.preview.background": "white",
+        "powershell.cwd": ".workspace",
+    }
+}

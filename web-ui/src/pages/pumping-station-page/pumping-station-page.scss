@@ -1,0 +1,24 @@
+.pumping-station-page-content {
+    height: 75vh;
+}
+
+.pumping-station-state-form {
+  .dx-field-item {
+    .pumping-station-state-form-check-box {
+        label:first-child {
+            flex: 1;
+        }
+
+        div {
+            flex: 0 !important;
+        }
+    }
+
+    .dx-layout-manager {
+        padding-right: 10px;
+    }
+  }
+}
+
+
+

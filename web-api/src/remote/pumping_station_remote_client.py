@@ -1,0 +1,45 @@
+from pymodbus.client import ModbusTcpClient
+
+from models.pumping.tcp_connector_model import TcpConnectorModel
+from models.pumping.pumping_station_state_model import PumpingStationStateModel
+from remote.pumping_station_modbus_registers import PumpingStationModbusRegisters
+
+
+class PumpingStationRemoteClient:
+    def __init__(self, connector: TcpConnectorModel):
+
+        self._modbus_tcp_client = ModbusTcpClient(host=connector.host, port=connector.port)
+
+    def __enter__(self):
+        self._modbus_tcp_client.connect()
+
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self._modbus_tcp_client.close()
+
+    def get_state(self):
+        coils_count = PumpingStationModbusRegisters.get_max_address(registers_type="COILS")
+        holding_registers_count = PumpingStationModbusRegisters.get_max_address(registers_type="HOLDING_REGISTERS")
+
+        pdu_coils = self._modbus_tcp_client.read_coils(address=0, count=coils_count)
+        pdu_holding_registers = self._modbus_tcp_client.read_holding_registers(address=0, count=holding_registers_count)
+        pumping_state = PumpingStationStateModel()
+
+        coils_counter = 0
+        for c in PumpingStationModbusRegisters.COILS:
+            param_name = c.name
+            setattr(pumping_state, param_name, pdu_coils.bits[coils_counter])
+            coils_counter += 1
+
+        holding_registers_counter = 0
+        for c in PumpingStationModbusRegisters.HOLDING_REGISTERS:
+            param_name = c.name
+            setattr(
+                pumping_state,
+                param_name,
+                pdu_holding_registers.registers[holding_registers_counter],
+            )
+            holding_registers_counter += 1
+
+        return pumping_state
