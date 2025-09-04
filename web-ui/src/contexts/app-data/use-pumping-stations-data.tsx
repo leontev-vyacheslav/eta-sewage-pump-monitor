@@ -36,7 +36,7 @@ export const usePumpingStationsData = () => {
         const response = await authHttpRequest({
             url: `${routes.host}${routes.pumpingStations}/state/${pumpingStationId}`,
             method: HttpConstants.Methods.Get as Method,
-        });
+        }, true);
 
         if (response && response.status === HttpConstants.StatusCodes.Ok) {
             return response.data as PumpingStationStateModel;
