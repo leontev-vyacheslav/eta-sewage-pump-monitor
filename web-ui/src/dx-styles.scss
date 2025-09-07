@@ -130,16 +130,21 @@ body {
 }
 
 /*TabPanel*/
-.app-tab-panel {
-  .dx-datagrid-nodata {
+
+  .dx-nodata {
+    color: #757575;
     padding: 5px;
     position: initial;
     width: 100%;
-    text-align: center;
     transform: none;
     font-size: inherit;
+
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-}
+
 
 /* Grids */
 .app-grid {

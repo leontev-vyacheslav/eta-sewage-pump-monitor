@@ -31,14 +31,12 @@ function PumpingStationPageContextProvider(props: any) {
     useEffect(() => {
         (async () => {
             await updatePumpingStationObjectStateAsync();
-            console.log('It was done one time');
         })()
     }, [updatePumpingStationObjectStateAsync]);
 
     useEffect(() => {
         const timer = setInterval(async () => {
             await updatePumpingStationObjectStateAsync();
-            console.log('It was done several times');
         }, 10000);
 
         return () => {

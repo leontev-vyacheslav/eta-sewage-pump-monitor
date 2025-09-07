@@ -5,7 +5,7 @@ import { CircuitIcon, ParamsIcon, PumpingStationIcon  } from '../../constants/ap
 import { MenuItemModel } from '../../models/menu-item-model';
 import { Item as TabPanelItem, TabPanel } from 'devextreme-react/tab-panel';
 import { IconTab } from '../../components/tab-utils/icon-tab';
-import { PumpingStationStateForm } from './tab-contents/pumping-station-state';
+import { PumpingStationStateForm } from './tab-contents/pumping-station-state-form';
 import './pumping-station-page.scss';
 import { PumpingStationSchema } from './tab-contents/pumping-station-schema';
 import { PumpingStationPageContextProvider } from './pumping-station-page-context';
@@ -23,12 +23,12 @@ const PumpingStationPageInternal = () => {
 
             <div className={ 'content-block' }>
                 <div className={ 'dx-card responsive-paddings pumping-station-page-content' }>
-                    <TabPanel>
-                        <TabPanelItem title='Параметры' tabRender={ (e) => <IconTab tab={ e } icon={ <ParamsIcon size={ 18 } /> } /> }>
-                            <PumpingStationStateForm />
-                        </TabPanelItem>
+                    <TabPanel className='app-tab-panel'>
                         <TabPanelItem title='Мнемосхема' tabRender={ (e) => <IconTab tab={ e } icon={ <CircuitIcon size={ 18 } /> } /> }>
                             <PumpingStationSchema />
+                        </TabPanelItem>
+                        <TabPanelItem title='Параметры' tabRender={ (e) => <IconTab tab={ e } icon={ <ParamsIcon size={ 18 } /> } /> }>
+                            <PumpingStationStateForm />
                         </TabPanelItem>
                     </TabPanel>
                 </div>

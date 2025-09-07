@@ -32,26 +32,8 @@ function App() {
             'validation-value-already-existed': 'Значение уже существует',
             'validation-range-formatted-with-values': 'Допустимые значения в диапазоне от {0} до {1}',
             'validation-range-overlapped': 'Перекрытие диапазонов',
-            'confirm-dialog-delete-all-schedules': 'Удалить все дни?',
-            'confirm-dialog-delete-all-schedule-windows': 'Удалить все окна?',
-            'confirm-dialog-delete-all-points': 'Удалить все точки?',
-            'confirm-dialog-reset-heating-circuit-settings': 'Сбросить настройки текущего контура?',
-            'confirm-dialog-change-heating-circuit-type': 'Изменить тип контура и применить настройки по-умолчанию в соответствии с выбранным типом?',
-            'menu-item-delete-all-schedules': 'Удалить все дни...',
-            'menu-item-delete-all-schedule-windows': 'Удалить все окна...',
-            'menu-item-delete-all-points': 'Удалить все точки...',
-            'menu-item-add-schedule-window': 'Добавить окно...',
-            'menu-item-add-point': 'Добавить точку...',
             'confirm-title': 'Подтвердить',
-            'temperature-graph-title': 'Температурный график',
-            'archives-graphs': 'Температурные графики',
-            'schedule-windows-title': 'Временные окна',
-            'schedules-title': 'Дни недели',
-            'dxDataGrid-noDataText': 'Нет данных для отображения',
-
-            'app-outdoor-temperature': 'Температура наружного воздуха, °C',
-            'app-media-temperature': 'Температура носителя, °C',
-            'app-measurement-time': 'Время измерения'
+            'noDataText': 'Нет данных для отображения',
         }
     });
     locale('ru-RU');
