@@ -1,5 +1,5 @@
 import { withNavigationWatcher } from '../contexts/navigation';
-import { HomePage, AboutPage, SignOutPage, AppSettingsPage, PumpingStationPage } from '../pages';
+import { HomePage, AboutPage, SignOutPage, PumpingStationPage } from '../pages';
 
 const routes = [
     {
@@ -10,10 +10,10 @@ const routes = [
         path: '/home',
         component: HomePage,
     },
-    {
-        path: '/app-settings',
-        component: AppSettingsPage,
-    },
+    // {
+    //     path: '/app-settings',
+    //     component: AppSettingsPage,
+    // },
     {
         path: '/pumping-stations',
         component: PumpingStationPage,

@@ -1,11 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { PumpingStationStateModel } from '../../models/pumping/pumping-station-state-model';
 import { useSearchParams } from 'react-router-dom';
 import { usePumpingStationsData } from '../../contexts/app-data/use-pumping-stations-data';
+import { Form } from 'devextreme-react/form';
 
 
 export type PumpingStationPageContextModel = {
     pumpingStationObjectState: PumpingStationStateModel | null;
+    dxPumpingStationStateFormRef: React.RefObject<Form>;
 };
 
 const PumpingStationPageContext = createContext({} as PumpingStationPageContextModel);
@@ -14,6 +16,7 @@ function PumpingStationPageContextProvider(props: any) {
     const [searchParams] = useSearchParams();
     const { getPumpingStationObjectStateAsync } = usePumpingStationsData();
     const [pumpingStationObjectState, setPumpingStationObjectState] = useState<PumpingStationStateModel | null>(null);
+    const dxPumpingStationStateFormRef = useRef<Form>(null);
 
     const updatePumpingStationObjectStateAsync = useCallback(async () => {
         const pumpingStationObjectId = searchParams.get('id');
@@ -21,18 +24,29 @@ function PumpingStationPageContextProvider(props: any) {
         if (!pumpingStationObjectId) {
             return;
         }
+        let scrollOffset = null;
+        if (dxPumpingStationStateFormRef && dxPumpingStationStateFormRef.current) {
+            scrollOffset = (dxPumpingStationStateFormRef.current.instance as any)._scrollable.scrollOffset();
+        }
 
         const pumpingStationObjectState = await getPumpingStationObjectStateAsync(pumpingStationObjectId);
         if (pumpingStationObjectState) {
             setPumpingStationObjectState(pumpingStationObjectState);
         }
-    }, [getPumpingStationObjectStateAsync, searchParams]);
+        setTimeout(() => {
+            if (dxPumpingStationStateFormRef && dxPumpingStationStateFormRef.current) {
+            (dxPumpingStationStateFormRef.current.instance as any)._scrollable.scrollTo(scrollOffset);
+        }
+        }, 0);
+
+
+    }, [getPumpingStationObjectStateAsync, searchParams, dxPumpingStationStateFormRef]);
 
     useEffect(() => {
         (async () => {
             await updatePumpingStationObjectStateAsync();
         })()
-    }, [updatePumpingStationObjectStateAsync]);
+    }, [updatePumpingStationObjectStateAsync, dxPumpingStationStateFormRef]);
 
     useEffect(() => {
         const timer = setInterval(async () => {
@@ -42,11 +56,12 @@ function PumpingStationPageContextProvider(props: any) {
         return () => {
             clearInterval(timer);
         };
-    }, [updatePumpingStationObjectStateAsync]);
+    }, [updatePumpingStationObjectStateAsync, dxPumpingStationStateFormRef]);
 
     return (
         <PumpingStationPageContext.Provider value={ {
             pumpingStationObjectState,
+            dxPumpingStationStateFormRef
         } } { ...props } />
     );
 }
