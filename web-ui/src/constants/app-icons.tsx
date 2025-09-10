@@ -24,6 +24,7 @@ export { RiDeleteBin7Line as DeleteAllIcon } from 'react-icons/ri';
 export { CgAddR as AddIcon } from 'react-icons/cg';
 export { BiEdit as EditIcon } from 'react-icons/bi';
 export { IoWarningSharp as WarningIcon } from 'react-icons/io5';
+export { IoWarningOutline as WarningOutlineIcon } from 'react-icons/io5';
 export { IoInformationCircleSharp as InformationIcon } from 'react-icons/io5';
 
 export { IoTodayOutline as WorkDateTodayIcon } from 'react-icons/io5';
@@ -73,3 +74,9 @@ export const GridAdditionalMenuIcon = () => <MdMoreVert style={ { cursor: 'point
 export { MdOutlineHeatPump as PumpingStationIcon } from 'react-icons/md';
 export { IoBusinessSharp as PumpingStationObjectsIcon } from 'react-icons/io5';
 export { IoOptionsOutline as ParamsIcon } from 'react-icons/io5';
+export { MdOutlineWater as EmergencyLevel } from 'react-icons/md';
+export { BsSignStopFill as StopIcon2 } from 'react-icons/bs';
+
+
+
+

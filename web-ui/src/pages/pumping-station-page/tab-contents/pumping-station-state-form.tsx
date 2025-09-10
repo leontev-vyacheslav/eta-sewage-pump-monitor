@@ -1,16 +1,19 @@
+import 'devextreme-react/switch';
 import Form, { GroupItem, SimpleItem } from 'devextreme-react/form';
 import { FieldDataChangedEvent } from 'devextreme/ui/form';
 import AppConstants from '../../../constants/app-constants';
-import 'devextreme-react/switch';
 import { usePumpingStationPage } from '../pumping-station-page-context';
 import { formatMessage } from 'devextreme/localization';
+import { usePumpingStationsData } from '../../../contexts/app-data/use-pumping-stations-data';
 
 
 export const PumpingStationStateForm = () => {
 
-    const { pumpingStationObjectState, dxPumpingStationStateFormRef } = usePumpingStationPage();
+    const { pumpingStationObjectState, dxPumpingStationStateFormRef, pumpingStationObject } = usePumpingStationPage();
+    const { postPumpingStationStateValue } = usePumpingStationsData();
 
     return (pumpingStationObjectState ?
+
         <Form
             className='app-form setting-form pumping-station-state-form'
             height={ AppConstants.formHeight }
@@ -18,8 +21,17 @@ export const PumpingStationStateForm = () => {
             colCount={ 1 }
             formData={ pumpingStationObjectState }
             ref={ dxPumpingStationStateFormRef }
+
             onFieldDataChanged={ async (e: FieldDataChangedEvent) => {
                 console.log(e);
+                if (!e.dataField || !pumpingStationObject) {
+                    return;
+                }
+
+                await postPumpingStationStateValue(pumpingStationObject.id, {
+                    propName: e.dataField,
+                    value: e.value
+                })
             } }
         >
             <GroupItem caption={ 'Состояния' }>

@@ -55,7 +55,7 @@ class PumpingStationModbusRegisters:
     @staticmethod
     def get_param_info_by_name(param_name: str, registers_type: Literal["COILS", "HOLDING_REGISTERS"] = "COILS"):
         registers = getattr(PumpingStationModbusRegisters, registers_type)
-        param_info = next(
+        param_info: ParameterModel = next(
             (p for p in registers if p.name == param_name), None
         )
 

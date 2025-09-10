@@ -6,11 +6,15 @@ import routes from '../../constants/app-api-routes';
 import { useAuth } from '../auth';
 import { PumpingStationObjectsModel } from '../../models/pumping/pumping-station-objects-model';
 import { PumpingStationStateModel } from '../../models/pumping/pumping-station-state-model';
+import { PumpingStationObjectModel } from '../../models/pumping/pumping-station-object-model';
+import { PumpingStationStateValueModel } from '../../models/pumping/pumping-station-state-value-model';
 
 
 export type AppDataContextPumpingStationsEndpointsModel = {
     getPumpingStationObjectsAsync: () => Promise<PumpingStationObjectsModel | null>;
     getPumpingStationObjectStateAsync: (pumpingStationId: string) => Promise<PumpingStationStateModel | null>;
+    getPumpingStationObjectAsync: (pumpingStationId: string) => Promise<PumpingStationObjectModel | null>;
+    postPumpingStationStateValue: (pumpingStationId: string, pumpingStationStateValue: PumpingStationStateValueModel) => Promise<PumpingStationStateValueModel | null>
 }
 
 export const usePumpingStationsData = () => {
@@ -45,8 +49,38 @@ export const usePumpingStationsData = () => {
         return null;
     }, [authHttpRequest]);
 
+
+    const getPumpingStationObjectAsync = useCallback( async (pumpingStationId: string) => {
+        const response = await authHttpRequest({
+            url: `${routes.host}${routes.pumpingStations}/${pumpingStationId}`,
+            method: HttpConstants.Methods.Get as Method,
+        }, true);
+
+        if (response && response.status === HttpConstants.StatusCodes.Ok) {
+            return response.data as PumpingStationObjectModel;
+        }
+
+        return null;
+    }, [authHttpRequest]);
+
+    const postPumpingStationStateValue = useCallback(async(pumpingStationId: string, pumpingStationStateValue: PumpingStationStateValueModel) => {
+        const response = await authHttpRequest({
+            url: `${routes.host}${routes.pumpingStations}/state/${pumpingStationId}`,
+            method: HttpConstants.Methods.Post as Method,
+            data: pumpingStationStateValue
+        });
+
+        if (response && response.status === HttpConstants.StatusCodes.Ok) {
+            return response.data as PumpingStationStateValueModel;
+        }
+
+        return null;
+    }, [authHttpRequest]);
+
     return {
         getPumpingStationObjectsAsync,
-        getPumpingStationObjectStateAsync
+        getPumpingStationObjectStateAsync,
+        getPumpingStationObjectAsync,
+        postPumpingStationStateValue
     }
 };

@@ -1,18 +1,21 @@
 import { useMemo } from 'react';
 import PageHeader from '../../components/page-header/page-header';
 import AppConstants from '../../constants/app-constants';
-import { CircuitIcon, ParamsIcon, PumpingStationIcon  } from '../../constants/app-icons';
+import { CircuitIcon, ParamsIcon, PumpingStationIcon } from '../../constants/app-icons';
 import { MenuItemModel } from '../../models/menu-item-model';
 import { Item as TabPanelItem, TabPanel } from 'devextreme-react/tab-panel';
 import { IconTab } from '../../components/tab-utils/icon-tab';
 import { PumpingStationStateForm } from './tab-contents/pumping-station-state-form';
-import './pumping-station-page.scss';
 import { PumpingStationSchema } from './tab-contents/pumping-station-schema';
-import { PumpingStationPageContextProvider } from './pumping-station-page-context';
+import { PumpingStationPageContextProvider, usePumpingStationPage } from './pumping-station-page-context';
+
+import './pumping-station-page.scss';
 
 const PumpingStationPageInternal = () => {
+    const { pumpingStationObject } = usePumpingStationPage();
+
     const menuItems = useMemo(() => {
-            return [] as MenuItemModel[];
+        return [] as MenuItemModel[];
     }, []);
 
     return (
@@ -20,14 +23,15 @@ const PumpingStationPageInternal = () => {
             <PageHeader caption={ 'Насосные станции' } menuItems={ menuItems }>
                 <PumpingStationIcon size={ AppConstants.headerIconSize } />
             </PageHeader>
-
+            <div style={ { marginLeft: '15px', fontSize: '1em', color: 'rgba(0, 0, 0, 0.87)' } }>{pumpingStationObject?.description}</div>
             <div className={ 'content-block' }>
                 <div className={ 'dx-card responsive-paddings pumping-station-page-content' }>
+
                     <TabPanel className='app-tab-panel'>
                         <TabPanelItem title='Мнемосхема' tabRender={ (e) => <IconTab tab={ e } icon={ <CircuitIcon size={ 18 } /> } /> }>
                             <PumpingStationSchema />
                         </TabPanelItem>
-                        <TabPanelItem title='Параметры' tabRender={ (e) => <IconTab tab={ e } icon={ <ParamsIcon size={ 18 } /> } /> }>
+                        <TabPanelItem title='Управление' tabRender={ (e) => <IconTab tab={ e } icon={ <ParamsIcon size={ 18 } /> } /> }>
                             <PumpingStationStateForm />
                         </TabPanelItem>
                     </TabPanel>
