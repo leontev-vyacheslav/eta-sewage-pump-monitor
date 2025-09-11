@@ -34,13 +34,38 @@ export const PumpingStationStateForm = () => {
                 })
             } }
         >
-            <GroupItem caption={ 'Состояния' }>
+            <GroupItem caption={ 'Управление' }>
                 <SimpleItem
                     dataField='startStop'
-                    label={ { location: 'top', showColon: true, text: 'Включения/выключения работы станции' } }
+                    label={ { location: 'top', showColon: true, text: 'Включение/выключение работы станции' } }
+                    editorType='dxSwitch'
+                />
+                <SimpleItem
+                    dataField='resetFaultPump1'
+                    label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 1' } }
                     editorType='dxSwitch'
                 />
 
+                <SimpleItem
+                    dataField='resetFaultPump2'
+                    label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 2' } }
+                    editorType='dxSwitch'
+                />
+
+                <SimpleItem
+                    dataField='resetOperatingTimePump1'
+                    label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 1' } }
+                    editorType='dxSwitch'
+                />
+
+                <SimpleItem
+                    dataField='resetOperatingTimePump2'
+                    label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 2' } }
+                    editorType='dxSwitch'
+                />
+            </GroupItem>
+
+            <GroupItem caption={ 'Состояния' }>
                 <SimpleItem
                     dataField='lowLevel'
                     label={ { location: 'left', showColon: true, text: 'Нижний уровень' } }
@@ -90,30 +115,6 @@ export const PumpingStationStateForm = () => {
                 />
 
                 <SimpleItem
-                    dataField='resetFaultPump1'
-                    label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 1' } }
-                    editorType='dxSwitch'
-                />
-
-                <SimpleItem
-                    dataField='resetFaultPump2'
-                    label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 2' } }
-                    editorType='dxSwitch'
-                />
-
-                <SimpleItem
-                    dataField='resetOperatingTimePump1'
-                    label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 1' } }
-                    editorType='dxSwitch'
-                />
-
-                <SimpleItem
-                    dataField='resetOperatingTimePump2'
-                    label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 2' } }
-                    editorType='dxSwitch'
-                />
-
-                <SimpleItem
                     dataField='faultPump1'
                     label={ { location: 'left', showColon: true, text: 'Ошибка насоса 1' } }
                     editorType='dxCheckBox'
@@ -128,9 +129,7 @@ export const PumpingStationStateForm = () => {
                     editorOptions={ { readOnly: true } }
                     cssClass='pumping-station-state-form-check-box'
                 />
-            </GroupItem>
 
-            <GroupItem caption={ 'Параметры' }>
                 <SimpleItem
                     dataField='timePump1'
                     label={ { location: 'top', showColon: true, text: 'Время наработки насоса 1, час' } }

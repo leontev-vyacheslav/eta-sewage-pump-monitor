@@ -6,6 +6,7 @@ import { useScreenSize } from '../../../utils/media-query';
 import './pumping-station-schema.scss';
 import { EmergencyLevel, PumpingStationIcon, StopIcon2 } from '../../../constants/app-icons';
 
+
 export const PumpingStationSchema = () => {
     const { pumpingStationObjectState } = usePumpingStationPage();
     const { isXSmall } = useScreenSize();
@@ -134,6 +135,7 @@ export const PumpingStationSchema = () => {
         pumpingStationObjectState ?
             <>
                 <div style={ { position: 'absolute', top: '20px', left: '85px' } }>
+                    {/* <RoundButton /> */}
                     {!pumpingStationObjectState.startStop ? <StopIcon2 size={ 26 } color='#804040' /> : null}
                     {pumpingStationObjectState.emergencyLevel ? <EmergencyLevel size={ 28 } color='#804040' /> : null}
                     {pumpingStationObjectState.faultPump1 ?
@@ -143,7 +145,7 @@ export const PumpingStationSchema = () => {
                         <PumpingStationIcon id='pump2-stop-icon' size={ 30 } color='#804040' />
                         : null}
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 379 638.04" height={ isXSmall ? 500 : 600 }>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 379 638.04" height={ isXSmall ? 500 : 600 } style={ { marginTop: '10px' } }>
                     <defs>
                         <pattern id="d" data-name="10 lpi 10%" x="0" y="0" width="72" height="72" patternTransform="translate(3206.15 -7921.49) rotate(-45)" patternUnits="userSpaceOnUse" viewBox="0 0 72 72">
                             <g>

@@ -19,8 +19,11 @@ def get_state(pumping_station_id: str):
     pumping_station_object = pumping_stations_settings_repository.get_pumping_stations_by_id(pumping_station_id)
 
     if pumping_station_object:
-        with PumpingStationRemoteClient(pumping_station_object.connector) as pumping_station_remote_client:
-            pumping_station_state = pumping_station_remote_client.get_state()
+        try:
+            with PumpingStationRemoteClient(pumping_station_object.connector) as pumping_station_remote_client:
+                pumping_station_state = pumping_station_remote_client.get_state()
+        except Exception as exc:
+            return MessageModel(message=str(exc)), HTTPStatus.BAD_GATEWAY
 
         return pumping_station_state
 

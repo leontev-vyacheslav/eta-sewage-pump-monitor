@@ -45,8 +45,16 @@ class PumpingStationRemoteClient:
         coils_count = PumpingStationModbusRegisters.get_max_address(registers_type="COILS")
         holding_registers_count = PumpingStationModbusRegisters.get_max_address(registers_type="HOLDING_REGISTERS")
 
-        pdu_coils = self._modbus_tcp_client.read_coils(address=0, count=coils_count)
-        pdu_holding_registers = self._modbus_tcp_client.read_holding_registers(address=0, count=holding_registers_count)
+        try:
+            pdu_coils = self._modbus_tcp_client.read_coils(address=0, count=coils_count)
+            pdu_holding_registers = self._modbus_tcp_client.read_holding_registers(
+                address=0, count=holding_registers_count
+            )
+        except Exception as exc:
+            raise Exception(
+                f"Ошибка связи с modbus-устройством по адресу {self._modbus_tcp_client.comm_params.host}: {self._modbus_tcp_client.comm_params.port}"
+            ) from exc
+
         pumping_state = PumpingStationStateModel()
 
         coils_counter = 0

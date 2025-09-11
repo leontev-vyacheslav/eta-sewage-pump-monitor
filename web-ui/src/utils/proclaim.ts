@@ -5,6 +5,18 @@ import { MessageModel } from '../models/message-model';
 
 
 export function proclaim(options: any) {
+    const toastStack = document.querySelector('.dx-toast-stack');
+    if(toastStack) {
+        const toastsChangeHandlerElements = document.querySelectorAll('.dx-visibility-change-handler.dx-toast');
+
+        if (toastsChangeHandlerElements) {
+            Array.from(toastsChangeHandlerElements).forEach(element => {
+                element.remove();
+            })
+        }
+        toastStack.innerHTML = '';
+    }
+
     notify({
         ...options,
         width: devices.current().phone ? '90%' : undefined,
@@ -32,9 +44,10 @@ export async function  proclaimError(error: unknown) {
     }
 
     errorMessage = !errorMessage ? (error as AxiosError).message : errorMessage;
-
+    // dx-overlay-wrapper dx-toast-wrapper
     proclaim({
         type: 'error',
-        message: errorMessage
+        message: errorMessage,
+        //displayTime: 1000000,
     });
 }

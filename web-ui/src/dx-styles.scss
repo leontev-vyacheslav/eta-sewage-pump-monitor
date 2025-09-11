@@ -199,7 +199,17 @@ body {
   .dx-datagrid-borders>.dx-datagrid-header-panel {
     padding: 0;
   }
+.dx-toast-message {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  line-height: 1.6em;
+  color: #464646;
+}
 
+.dx-toast-stack {
+  padding: 10px;
+  padding-left: 5px;
+}
 }
 
 .app-grid {
@@ -325,4 +335,23 @@ body {
 
 .dx-popup {
   // margin: 10px;
+}
+
+.dx-toast-message {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  line-height: 1.6em;
+  // color: #464646;
+}
+
+.dx-toast-stack {
+  padding: 10px;
+  padding-left: 0px;
+}
+
+.dx-toast-content {
+  width: 100% !important;
+}
+.dx-toast-wrapper {
+  margin-top: 5px;
 }
