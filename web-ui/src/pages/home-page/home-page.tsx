@@ -4,6 +4,7 @@ import { usePumpingStationsData } from '../../contexts/app-data/use-pumping-stat
 import { useNavigate } from 'react-router';
 
 import './home-page.scss';
+import { formatMessage } from 'devextreme/localization';
 
 export const HomePageInternal = () => {
     const { getPumpingStationObjectsAsync } = usePumpingStationsData();
@@ -19,7 +20,7 @@ export const HomePageInternal = () => {
         })();
     }, [getPumpingStationObjectsAsync, navigate]);
 
-    return null;
+    return <div className='dx-nodata'><div>{formatMessage('noDataText')}</div></div>;
 };
 
 export const HomePage = () => {

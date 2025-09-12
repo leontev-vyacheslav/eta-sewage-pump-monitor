@@ -33,6 +33,7 @@ function App() {
             'validation-range-formatted-with-values': 'Допустимые значения в диапазоне от {0} до {1}',
             'validation-range-overlapped': 'Перекрытие диапазонов',
             'confirm-title': 'Подтвердить',
+            'confirm-dialog-system-start-stop': 'Внимание! Действительно хотите выполнить {0} устройства!',
             'noDataText': 'Нет данных для отображения',
         }
     });

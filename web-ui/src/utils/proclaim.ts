@@ -44,10 +44,11 @@ export async function  proclaimError(error: unknown) {
     }
 
     errorMessage = !errorMessage ? (error as AxiosError).message : errorMessage;
-    // dx-overlay-wrapper dx-toast-wrapper
+    if (errorMessage === 'Network Error') {
+        errorMessage = 'Сетевая ошибка. Отсутствует связь с сервером или сетевое соединение.'
+    }
     proclaim({
         type: 'error',
         message: errorMessage,
-        //displayTime: 1000000,
     });
 }

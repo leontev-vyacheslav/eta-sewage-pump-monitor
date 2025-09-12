@@ -1,4 +1,3 @@
-import { createElement } from 'react';
 import { alert, confirm } from 'devextreme/ui/dialog';
 import dxPopup, { ToolbarItem } from 'devextreme/ui/popup';
 import dxTextBox, { Properties } from 'devextreme/ui/text_box';
@@ -7,25 +6,30 @@ import * as AppIcons from '../constants/app-icons';
 import { PromptSimpleDialogModel, SimpleDialogContentModel, SimpleDialogModel } from '../models/simple-dialog';
 import ReactDOMServer from 'react-dom/server';
 import AppConstants from '../constants/app-constants';
+import React from 'react';
 
 const dialogContentRender = ({ iconName, iconSize, iconColor, textRender }: SimpleDialogContentModel) => {
-
     iconColor = iconColor ? iconColor : AppConstants.colors.themeBaseAccent;
+    iconSize = iconSize ? iconSize : 24;
 
-    function innerContent() {
-        return (
-            <div style={ { display: 'flex', alignItems: 'center' } }>
-                <div>
-                    {createElement((AppIcons as any)[iconName], { size: iconSize = iconSize ? iconSize : 24, style: { alignSelf: 'flex-start', color: iconColor ? iconColor : '#ff5722' } })}
-                </div>
-                {textRender ? <span style={ { marginLeft: 10 } }>{textRender()}</span> : null}
-            </div>
-        );
-    }
+    const IconComponent = (AppIcons as any)[iconName];
 
-    return ReactDOMServer.renderToString(
-        createElement(innerContent as any, {})
+    const InnerContent = () => (
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center' } },
+            React.createElement('div', null,
+                React.createElement(IconComponent, {
+                    size: iconSize,
+                    style: {
+                        alignSelf: 'flex-start',
+                        color: iconColor
+                    }
+                })
+            ),
+            textRender && React.createElement('span', { style: { marginLeft: 10 } }, textRender())
+        )
     );
+    debugger
+    return ReactDOMServer.renderToString(React.createElement(InnerContent));
 }
 
 const showConfirmDialog = ({ title, iconName, iconSize, iconColor, textRender, callback }: SimpleDialogModel) => {

@@ -5,11 +5,12 @@ import AppConstants from '../../../constants/app-constants';
 import { usePumpingStationPage } from '../pumping-station-page-context';
 import { formatMessage } from 'devextreme/localization';
 import { usePumpingStationsData } from '../../../contexts/app-data/use-pumping-stations-data';
+import { showConfirmDialogEx } from '../../../utils/dialogs';
 
 
 export const PumpingStationStateForm = () => {
 
-    const { pumpingStationObjectState, dxPumpingStationStateFormRef, pumpingStationObject } = usePumpingStationPage();
+    const { pumpingStationObjectState, dxPumpingStationStateFormRef, pumpingStationObject, timerLockRef, updatePumpingStationObjectStateAsync } = usePumpingStationPage();
     const { postPumpingStationStateValue } = usePumpingStationsData();
 
     return (pumpingStationObjectState ?
@@ -23,15 +24,40 @@ export const PumpingStationStateForm = () => {
             ref={ dxPumpingStationStateFormRef }
 
             onFieldDataChanged={ async (e: FieldDataChangedEvent) => {
-                console.log(e);
                 if (!e.dataField || !pumpingStationObject) {
                     return;
                 }
 
-                await postPumpingStationStateValue(pumpingStationObject.id, {
-                    propName: e.dataField,
-                    value: e.value
-                })
+                if (e.dataField === 'startStop') {
+                    timerLockRef.current = true;
+                    showConfirmDialogEx({
+                        title: formatMessage('confirm-title'),
+                        iconName: 'WarningIcon',
+                        iconSize: 32,
+                        iconColor: 'darkred',
+                        textRender: () => {
+                            return <>{formatMessage('confirm-dialog-system-start-stop', e.value ? 'запуск' : 'останов')} </>
+                        },
+                        callback: async (dialogResult) => {
+                            try {
+                                if (dialogResult) {
+                                    await postPumpingStationStateValue(pumpingStationObject.id, {
+                                        propName: e.dataField!,
+                                        value: e.value
+                                    });
+                                }
+                            } finally {
+                                await updatePumpingStationObjectStateAsync();
+                                timerLockRef.current = false;
+                            }
+                        },
+                    });
+                } else {
+                    await postPumpingStationStateValue(pumpingStationObject.id, {
+                        propName: e.dataField,
+                        value: e.value
+                    });
+                }
             } }
         >
             <GroupItem caption={ 'Управление' }>

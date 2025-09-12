@@ -10,6 +10,8 @@ export type PumpingStationPageContextModel = {
     pumpingStationObjectState: PumpingStationStateModel | null;
     pumpingStationObject: PumpingStationObjectModel | null;
     dxPumpingStationStateFormRef: React.RefObject<Form>;
+    timerLockRef: React.MutableRefObject<boolean>;
+    updatePumpingStationObjectStateAsync: () => Promise<void>
 };
 
 const PumpingStationPageContext = createContext({} as PumpingStationPageContextModel);
@@ -20,6 +22,7 @@ function PumpingStationPageContextProvider(props: any) {
     const [pumpingStationObjectState, setPumpingStationObjectState] = useState<PumpingStationStateModel | null>(null);
     const [pumpingStationObject, setPumpingStationObject] = useState<PumpingStationObjectModel | null>(null);
     const dxPumpingStationStateFormRef = useRef<Form>(null);
+    const timerLockRef = useRef<boolean>(false);
 
     const updatePumpingStationObjectStateAsync = useCallback(async () => {
         const pumpingStationObjectId = searchParams.get('id');
@@ -62,6 +65,10 @@ function PumpingStationPageContextProvider(props: any) {
 
     useEffect(() => {
         const timer = setInterval(async () => {
+            if (timerLockRef.current) {
+                return;
+            }
+
             await updatePumpingStationObjectStateAsync();
         }, 10000);
 
@@ -74,7 +81,9 @@ function PumpingStationPageContextProvider(props: any) {
         <PumpingStationPageContext.Provider value={ {
             pumpingStationObjectState,
             pumpingStationObject,
-            dxPumpingStationStateFormRef
+            dxPumpingStationStateFormRef,
+            timerLockRef,
+            updatePumpingStationObjectStateAsync
         } } { ...props } />
     );
 }
