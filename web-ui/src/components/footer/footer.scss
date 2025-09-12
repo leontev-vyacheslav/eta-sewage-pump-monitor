@@ -5,4 +5,9 @@
   color: rgba($base-text-color, alpha($base-text-color) );
   padding-top: 10px;
   padding-bottom: 30px;
+
+  .screen-x-small & {
+   font-size: 12px;
+  }
 }
+

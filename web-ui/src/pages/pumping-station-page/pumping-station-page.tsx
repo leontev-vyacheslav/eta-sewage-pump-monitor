@@ -20,10 +20,10 @@ const PumpingStationPageInternal = () => {
 
     return (
         <>
-            <PageHeader caption={ 'Насосные станции' } menuItems={ menuItems }>
+            <PageHeader caption={ `Насосные станции: ${pumpingStationObject?.name}` } menuItems={ menuItems }>
                 <PumpingStationIcon size={ AppConstants.headerIconSize } />
             </PageHeader>
-            <div style={ { marginLeft: '15px', fontSize: '1em', color: 'rgba(0, 0, 0, 0.87)' } }>{pumpingStationObject?.description}</div>
+            {/* <div style={ { marginLeft: '15px', fontSize: '1em', color: 'rgba(0, 0, 0, 0.87)' } }>{pumpingStationObject?.description}</div> */}
             <div className={ 'content-block' }>
                 <div className={ 'dx-card responsive-paddings pumping-station-page-content' }>
 
