@@ -8,6 +8,7 @@ from data_access.accounts_settings_repository import AccountsSettingsRepository
 from data_access.pumping_stations_settings_repository import PumpingStationsSettingsRepository
 from models.common.message_model import MessageModel
 from responses.json_response import JsonResponse
+from workers.worker_starter_extension import WorkerStarter
 
 APP_VERSION = 'v.0.1.20250320-131031'
 APP_NAME = 'Eta Sewage Pump Monitor Web API'
@@ -22,6 +23,7 @@ CORS(
 )
 AccountsSettingsRepository(app)
 PumpingStationsSettingsRepository(app)
+WorkerStarter(app)
 
 
 @app.errorhandler(Exception)

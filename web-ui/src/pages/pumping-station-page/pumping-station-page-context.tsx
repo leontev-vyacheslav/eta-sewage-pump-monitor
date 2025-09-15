@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { usePumpingStationsData } from '../../contexts/app-data/use-pumping-stations-data';
 import { Form } from 'devextreme-react/form';
 import { PumpingStationObjectModel } from '../../models/pumping/pumping-station-object-model';
+import { proclaim } from '../../utils/proclaim';
 
 
 export type PumpingStationPageContextModel = {
@@ -37,6 +38,14 @@ function PumpingStationPageContextProvider(props: any) {
 
         const pumpingStationObjectState = await getPumpingStationObjectStateAsync(pumpingStationObjectId);
         if (pumpingStationObjectState) {
+            if (pumpingStationObjectState.emergencyLevel) {
+                proclaim({
+                    type: 'warning',
+                    message: 'Достигнут аварийный уровень жидкости!',
+                    displayTime: 5000,
+                });
+            }
+
             setPumpingStationObjectState(pumpingStationObjectState);
         }
         setTimeout(() => {
@@ -44,7 +53,6 @@ function PumpingStationPageContextProvider(props: any) {
                 (dxPumpingStationStateFormRef.current.instance as any)._scrollable.scrollTo(scrollOffset);
             }
         }, 0);
-
     }, [getPumpingStationObjectStateAsync, searchParams, dxPumpingStationStateFormRef]);
 
     useEffect(() => {

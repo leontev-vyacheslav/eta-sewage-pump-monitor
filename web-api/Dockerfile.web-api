@@ -6,7 +6,6 @@ COPY ./ /app/
 
 RUN python3 -m pip install -r requirements.txt
 
-# CMD ["sleep", "infinity"]
 EXPOSE 5000
 
 CMD ["gunicorn", "--workers=1", "--threads=4", "--bind=0.0.0.0:5000", "--chdir=./src", "app:app"]

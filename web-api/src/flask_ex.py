@@ -1,11 +1,12 @@
 import os
 import pathlib
-from typing import Callable, Optional, Any, Union
+from typing import Callable, List, Optional, Any, Union
 
 from flask import Flask
 from data_access.accounts_settings_repository import AccountsSettingsRepository
 from data_access.pumping_stations_settings_repository import PumpingStationsSettingsRepository
 from models.common.accounts_settings_model import AccountsSettingsModel
+from models.common.app_background_thread_model import AppBackgroundThreadModel
 from models.pumping.pumping_stations_settings_model import PumpingStationsSettingsModel
 
 from models.common.internal_settings_model import InternalSettingsModel
@@ -48,6 +49,7 @@ class FlaskEx(Flask):
 
 
         self.internal_settings = self._init_internal_settings()
+        self.app_background_threads: List[AppBackgroundThreadModel] = []
         self.app_logger = build_logger('default_app_logger')
 
     def api_route(self, rule: str, **options: Any) -> Callable:

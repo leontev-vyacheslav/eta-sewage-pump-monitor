@@ -1,3 +1,4 @@
+from typing import List
 from models.abstracts.app_base_model import AppBaseModel
 from models.common.enums.user_role_model import UserRoleModel
 
@@ -10,6 +11,8 @@ class AccountModel(AppBaseModel):
     login: str
 
     password: str
+
+    telegram_ids: List[str]
 
 
 class ExtendedAccountModel(AccountModel):

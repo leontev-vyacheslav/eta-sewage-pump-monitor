@@ -6,12 +6,14 @@ import { usePumpingStationPage } from '../pumping-station-page-context';
 import { formatMessage } from 'devextreme/localization';
 import { usePumpingStationsData } from '../../../contexts/app-data/use-pumping-stations-data';
 import { showConfirmDialogEx } from '../../../utils/dialogs';
+import { useAuth } from '../../../contexts/auth';
 
 
 export const PumpingStationStateForm = () => {
 
     const { pumpingStationObjectState, dxPumpingStationStateFormRef, pumpingStationObject, timerLockRef, updatePumpingStationObjectStateAsync } = usePumpingStationPage();
     const { postPumpingStationStateValue } = usePumpingStationsData();
+    const { isOperator } = useAuth();
 
     return (pumpingStationObjectState ?
 
@@ -65,29 +67,34 @@ export const PumpingStationStateForm = () => {
                     dataField='startStop'
                     label={ { location: 'top', showColon: true, text: 'Включение/выключение работы станции' } }
                     editorType='dxSwitch'
+                    editorOptions={ { readOnly: isOperator() } }
                 />
                 <SimpleItem
                     dataField='resetFaultPump1'
                     label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 1' } }
                     editorType='dxSwitch'
+                    editorOptions={ { readOnly: isOperator() } }
                 />
 
                 <SimpleItem
                     dataField='resetFaultPump2'
                     label={ { location: 'top', showColon: true, text: 'Сброс ошибки насоса 2' } }
                     editorType='dxSwitch'
+                    editorOptions={ { readOnly: isOperator() } }
                 />
 
                 <SimpleItem
                     dataField='resetOperatingTimePump1'
                     label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 1' } }
                     editorType='dxSwitch'
+                    editorOptions={ { readOnly: isOperator() } }
                 />
 
                 <SimpleItem
                     dataField='resetOperatingTimePump2'
                     label={ { location: 'top', showColon: true, text: 'Сброс времени наработки насоса 2' } }
                     editorType='dxSwitch'
+                    editorOptions={ { readOnly: isOperator() } }
                 />
             </GroupItem>
 

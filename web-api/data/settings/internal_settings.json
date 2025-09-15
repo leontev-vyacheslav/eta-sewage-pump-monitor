@@ -1,3 +1,9 @@
 {
-
+    "workers":[
+        {
+            "name": "pumping_station_state_watcher",
+            "interval": 20,
+            "immediately": true
+        }
+    ]
 }

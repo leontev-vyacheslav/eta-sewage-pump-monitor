@@ -1,5 +1,5 @@
 from data_access.settings_repository_base import SettingsRepositoryBase
-from models.pumping.pumping_station_objects_model import PumpingStationObjectsModel
+from models.pumping.pumping_station_objects_model import PumpingStationObjectsExModel, PumpingStationObjectsModel
 from models.pumping.pumping_station_object_model import PumpingStationObjectModel
 
 

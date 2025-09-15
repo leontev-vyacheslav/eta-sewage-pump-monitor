@@ -12,7 +12,7 @@ from remote.pumping_station_remote_client import PumpingStationRemoteClient
 
 
 @app.api_route("/pumping-stations/state/<pumping_station_id>", methods=["GET"])
-@authorize(roles=[UserRoleModel.ADMIN])
+@authorize(roles=[UserRoleModel.ADMIN, UserRoleModel.OPERATOR])
 @validate(response_by_alias=True)
 def get_state(pumping_station_id: str):
     pumping_stations_settings_repository = app.get_pumping_stations_settings_repository()
@@ -31,7 +31,7 @@ def get_state(pumping_station_id: str):
 
 
 @app.api_route("/pumping-stations/list-by-account-id/<account_id>", methods=["GET"])
-@authorize(roles=[UserRoleModel.ADMIN])
+@authorize(roles=[UserRoleModel.ADMIN, UserRoleModel.OPERATOR])
 @validate(response_by_alias=True)
 def get_list_objects(account_id: str):
     pumping_stations_settings_repository = app.get_pumping_stations_settings_repository()
@@ -41,7 +41,7 @@ def get_list_objects(account_id: str):
 
 
 @app.api_route("/pumping-stations/<pumping_station_id>", methods=["GET"])
-@authorize(roles=[UserRoleModel.ADMIN])
+@authorize(roles=[UserRoleModel.ADMIN, UserRoleModel.OPERATOR])
 @validate(response_by_alias=True)
 def get_object(pumping_station_id: str):
     pumping_stations_settings_repository = app.get_pumping_stations_settings_repository()

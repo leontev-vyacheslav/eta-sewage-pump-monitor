@@ -26,6 +26,7 @@ def signin(body: SignInModel):
     if hashed_signin_password == account.password:
         token = jwt.encode(
             {
+                "role": account.role,
                 "exp": datetime.now(timezone.utc) + timedelta(days=1),
             },
             account.password,
