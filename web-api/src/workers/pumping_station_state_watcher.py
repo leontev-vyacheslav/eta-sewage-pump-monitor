@@ -1,6 +1,7 @@
 from threading import Lock
 from time import sleep
 
+from bot.pumping_stations_telegram_bot import PumpingStationsTelegramBot
 from flask_ex import FlaskEx
 from remote.pumping_station_remote_client import PumpingStationRemoteClient
 
@@ -27,13 +28,14 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
 
                         telegram_ids = [item for sub_list in pumping_station_telegram_ids for item in sub_list]
 
-                        print(telegram_ids)
-
                         if pumping_station_state.emergency_level:
 
                             for telegram_id in telegram_ids:
                                 app.app_logger.debug(telegram_id)
-                                
+                                bot: PumpingStationsTelegramBot = app.bot
+                                bot.updater.bot.send_message(telegram_id, f"❌ There is an emergency level on the pumping station \"{pumping_station.description}\"")
+
+
                 except Exception as exc:
                     app.app_logger.warning(exc)
 

@@ -1,5 +1,6 @@
 from http import HTTPStatus
 import os
+from dotenv import load_dotenv
 
 from flask_cors import CORS
 
@@ -13,7 +14,7 @@ from workers.worker_starter_extension import WorkerStarter
 
 APP_VERSION = "v.0.1.20250320-131031"
 APP_NAME = "Eta Sewage Pump Monitor Web API"
-
+load_dotenv()
 
 app = FlaskEx(__name__)
 CORS(
@@ -24,12 +25,14 @@ CORS(
 )
 AccountsSettingsRepository(app)
 PumpingStationsSettingsRepository(app)
-WorkerStarter(app)
-
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 bot = PumpingStationsTelegramBot(app=app, token=BOT_TOKEN)
 app.bot = bot
+
+WorkerStarter(app)
+
+
 
 
 @app.errorhandler(Exception)

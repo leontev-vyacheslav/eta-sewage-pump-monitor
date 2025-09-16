@@ -11,7 +11,3 @@ class PumpingStationObjectModel(AppBaseModel):
     description: str
 
     connector: TcpConnectorModel
-
-
-class PumpingStationObjectExModel(PumpingStationObjectModel):
-    accounts: List[str]

@@ -111,6 +111,24 @@ class PumpingStationsTelegramBot:
 
         return ConversationHandler.END
 
+    def __logout_command(self, update: Update, context: CallbackContext):
+        chat_id = str(update.effective_chat.id)
+        accounts = self.app.get_accounts_settings().accounts
+        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
+
+        if chat_id in user_states:
+            del user_states[chat_id]
+
+        if chat_id in authorized_users_ids:
+            account = next((a for a in accounts.items if chat_id in a.telegram_ids), None)
+            if account is None:
+                update.message.reply_text("❌ Учетная запись не найдена.")
+            else:
+                account.telegram_ids.remove(chat_id)
+                self.app.get_accounts_settings_repository().update(current_settings=None)
+        else:
+            update.message.reply_text("❌ Вход не был ранее выполнен. Используйте команду /login для входа.")
+
     def __set_commands_menu(self):
         commands = [
             BotCommand("start", "Запуск бота"),
@@ -135,6 +153,7 @@ class PumpingStationsTelegramBot:
                 fallbacks=[CommandHandler("cancel", self.__cancel_command)],
             )
         )
+        dispatcher.add_handler(CommandHandler("logout", self.__logout_command))
 
         self.__set_commands_menu()
 
