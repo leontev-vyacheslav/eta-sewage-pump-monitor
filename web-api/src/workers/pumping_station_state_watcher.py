@@ -19,20 +19,23 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
             accounts = app.get_accounts_settings().accounts.items
 
             for pumping_station in pumping_station_objects:
-                with PumpingStationRemoteClient(pumping_station.connector) as pumping_station_remote_client:
-                    pumping_station_state = pumping_station_remote_client.get_state()
-                    pumping_station_account_ids = [l.account_id for l in account_links if pumping_station.id in l.pumping_station_objects]
-                    pumping_station_telegram_ids = [a.telegram_ids for a in accounts if a.id in pumping_station_account_ids]
+                try:
+                    with PumpingStationRemoteClient(pumping_station.connector) as pumping_station_remote_client:
+                        pumping_station_state = pumping_station_remote_client.get_state()
+                        pumping_station_account_ids = [l.account_id for l in account_links if pumping_station.id in l.pumping_station_objects]
+                        pumping_station_telegram_ids = [a.telegram_ids for a in accounts if a.id in pumping_station_account_ids]
 
-                    telegram_ids = [item for sub_list in pumping_station_telegram_ids for item in sub_list]
+                        telegram_ids = [item for sub_list in pumping_station_telegram_ids for item in sub_list]
 
-                    print(telegram_ids)
+                        print(telegram_ids)
 
-                    if pumping_station_state.emergency_level:
+                        if pumping_station_state.emergency_level:
 
-                        for telegram_id in telegram_ids:
-                            # bot.send_text(telegram_id)
-                            pass
+                            for telegram_id in telegram_ids:
+                                app.app_logger.debug(telegram_id)
+                                
+                except Exception as exc:
+                    app.app_logger.warning(exc)
 
 
             app.app_logger.info('The pumping station state watcher is done.')

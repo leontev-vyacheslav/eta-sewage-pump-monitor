@@ -4,6 +4,11 @@
             "name": "pumping_station_state_watcher",
             "interval": 20,
             "immediately": true
+        },
+        {
+            "name": "pumping_station_telegram_bot_launcher",
+            "interval": 2,
+            "immediately": true
         }
     ]
 }

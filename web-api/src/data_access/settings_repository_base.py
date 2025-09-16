@@ -1,6 +1,7 @@
 import fcntl
 import os
 from typing import Any, List, Optional, Set
+import json
 
 from pydantic import BaseModel
 
@@ -32,26 +33,30 @@ class SettingsRepositoryBase():
         with open(self.data_path, 'r', encoding='utf-8') as file:
             try:
                 fcntl.flock(file.fileno(), fcntl.LOCK_SH)
-                json = file.read()
+                json_str = file.read()
             finally:
                 fcntl.flock(file.fileno(), fcntl.LOCK_UN)
 
             settings_model = globals().get(self.__class__.__name__.replace("Repository", 'Model'))
 
-            self.settings = getattr(settings_model, 'parse_raw')(json)
+            self.settings = getattr(settings_model, 'parse_raw')(json_str)
 
     def _dump(self) -> bool:
         with open(self.data_path, 'w', encoding='utf-8') as file:
-            json = self.settings.json(by_alias=True, indent=4, ensure_ascii=False)
+            json_str = json.dumps(
+                self.settings.model_dump(by_alias=True),
+                indent=4,
+                ensure_ascii=False
+            )
             try:
                 fcntl.flock(file.fileno(), fcntl.LOCK_EX)
-                dumped_bytes = file.write(json)
+                dumped_bytes = file.write(json_str)
                 file.flush()
                 os.fsync(file.fileno())
             finally:
                 fcntl.flock(file.fileno(), fcntl.LOCK_UN)
 
-        return len(json) == dumped_bytes
+        return len(json_str) == dumped_bytes
 
     def _find_changed_fields(self, obj1: Any, obj2: Any, path: str = '', visited: Optional[Set] = None) -> List[ChangeTrackerItemModel]:
 
@@ -104,6 +109,6 @@ class SettingsRepositoryBase():
         return self._find_changed_fields(self.settings, updated_settings, path, visited)
 
     def update(self, current_settings):
-
-        self.settings = current_settings
+        if current_settings:
+            self.settings = current_settings
         self._dump()

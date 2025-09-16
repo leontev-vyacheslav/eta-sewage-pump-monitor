@@ -6,14 +6,17 @@
                 "role": 1,
                 "login": "Admin",
                 "password": "17756315ebd47b7110359fc7b168179bf6f2df3646fcc888bc8aa05c78b38ac1",
-                "telegram_ids": ["a", "b", "c"]
+                "telegramIds": [
+                    "965648301",
+                    "5467557669"
+                ]
             },
             {
                 "id": "08dd6d2a-2f40-40c6-8c63-b14a840e52ce",
                 "role": 2,
                 "login": "Operator",
                 "password": "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646",
-                "telegram_ids": ["d"]
+                "telegramIds": []
             }
         ]
     }
