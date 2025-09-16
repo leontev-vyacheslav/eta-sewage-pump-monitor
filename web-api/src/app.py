@@ -26,8 +26,11 @@ AccountsSettingsRepository(app)
 PumpingStationsSettingsRepository(app)
 WorkerStarter(app)
 
-bot = PumpingStationsTelegramBot(app=app, token="8467854464:AAEXuWpGcW3w2gUb-q23H4P0zRHeFPUcFkE")
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+
+bot = PumpingStationsTelegramBot(app=app, token=BOT_TOKEN)
 app.bot = bot
+
 
 @app.errorhandler(Exception)
 def handle_unhandled_exception(error):
