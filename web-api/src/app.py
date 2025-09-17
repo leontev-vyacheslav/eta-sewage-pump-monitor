@@ -5,16 +5,18 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 
 from flask_ex import FlaskEx
-from bot.pumping_stations_telegram_bot import PumpingStationsTelegramBot
+from bot.pumping_stations_telegram_bot_agent import PumpingStationsTelegramBotAgent
 from data_access.accounts_settings_repository import AccountsSettingsRepository
 from data_access.pumping_stations_settings_repository import PumpingStationsSettingsRepository
 from models.common.message_model import MessageModel
 from responses.json_response import JsonResponse
 from workers.worker_starter_extension import WorkerStarter
 
+load_dotenv()
 APP_VERSION = "v.0.1.20250320-131031"
 APP_NAME = "Eta Sewage Pump Monitor Web API"
-load_dotenv()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
 
 app = FlaskEx(__name__)
 CORS(
@@ -25,14 +27,10 @@ CORS(
 )
 AccountsSettingsRepository(app)
 PumpingStationsSettingsRepository(app)
-BOT_TOKEN = os.getenv('BOT_TOKEN')
 
-bot = PumpingStationsTelegramBot(app=app, token=BOT_TOKEN)
-app.bot = bot
+app.pumping_stations_telegram_bot_agent = PumpingStationsTelegramBotAgent(app=app, token=BOT_TOKEN)
 
 WorkerStarter(app)
-
-
 
 
 @app.errorhandler(Exception)

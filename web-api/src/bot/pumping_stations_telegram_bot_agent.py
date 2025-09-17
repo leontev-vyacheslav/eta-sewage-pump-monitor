@@ -1,14 +1,20 @@
+from enum import IntEnum
 import hashlib
 from telegram import BotCommand, Update
 from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters
 
 from flask_ex import FlaskEx
 
-WAITING_FOR_LOGIN, WAITING_FOR_PASSWORD = range(2)
+
+class LoginConversationalStates(IntEnum):
+    WAITING_FOR_LOGIN = 1
+    WAITING_FOR_PASSWORD = 2
+
+
 user_states = {}
 
 
-class PumpingStationsTelegramBot:
+class PumpingStationsTelegramBotAgent:
 
     def __init__(self, app: FlaskEx, token: str):
         self.app = app
@@ -39,11 +45,11 @@ class PumpingStationsTelegramBot:
 
             return ConversationHandler.END
 
-        user_states[chat_id] = {"state": WAITING_FOR_LOGIN, "attempts": 0, "login": None}
+        user_states[chat_id] = {"state": LoginConversationalStates.WAITING_FOR_LOGIN, "attempts": 0, "login": None}
 
-        update.message.reply_text("Введите ЛОГИН вашей учетной записи:")
+        update.message.reply_text("🔒 Введите 👤 ЛОГИН вашей учетной записи:")
 
-        return WAITING_FOR_LOGIN
+        return LoginConversationalStates.WAITING_FOR_LOGIN
 
     def __receive_login(self, update: Update, context: CallbackContext):
         chat_id = str(update.effective_chat.id)
@@ -52,17 +58,17 @@ class PumpingStationsTelegramBot:
 
         if login not in [a.login for a in accounts.items]:
             update.message.reply_text(
-                "❌ Пользователь не найден среди зарегистрированных аккаунтов. Повторите попытку снова."
+                "❌ Пользователь 👤 не найден среди зарегистрированных аккаунтов 👥. Повторите попытку снова."
             )
 
-            return WAITING_FOR_LOGIN
+            return LoginConversationalStates.WAITING_FOR_LOGIN
 
         user_states[chat_id]["login"] = login
-        user_states[chat_id]["state"] = WAITING_FOR_PASSWORD
+        user_states[chat_id]["state"] = LoginConversationalStates.WAITING_FOR_PASSWORD
 
-        update.message.reply_text("Введите ПАРОЛЬ вашей учетной записи:")
+        update.message.reply_text("🔒 Введите 🔑 ПАРОЛЬ вашей учетной записи:")
 
-        return WAITING_FOR_PASSWORD
+        return LoginConversationalStates.WAITING_FOR_PASSWORD
 
     def __receive_password(self, update: Update, context: CallbackContext):
         chat_id = str(update.effective_chat.id)
@@ -81,7 +87,7 @@ class PumpingStationsTelegramBot:
             del user_states[chat_id]
 
             update.message.reply_text(
-                f"✅ **Вход был успешно выполнен с учетной записью {login}!**\n" f"Вы можете получать уведомления!"
+                f"✅ Вход был успешно выполнен с учетной записью {login}!\n" f"Вы можете получать 💬 уведомления!"
             )
 
             return ConversationHandler.END
@@ -90,9 +96,11 @@ class PumpingStationsTelegramBot:
         attempts_left = 3 - user_states[chat_id]["attempts"]
 
         if attempts_left > 0:
-            update.message.reply_text(f"❌ Неверный пароль. Попыток осталось: {attempts_left}.\nВведите пароль снова:")
+            update.message.reply_text(
+                f"❌ Неверный 🔑 ПАРОЛЬ. Попыток осталось: {attempts_left}.\nВведите 🔑 ПАРОЛЬ снова:"
+            )
 
-            return WAITING_FOR_PASSWORD
+            return LoginConversationalStates.WAITING_FOR_PASSWORD
 
         del user_states[chat_id]
         update.message.reply_text(
@@ -126,14 +134,16 @@ class PumpingStationsTelegramBot:
             else:
                 account.telegram_ids.remove(chat_id)
                 self.app.get_accounts_settings_repository().update(current_settings=None)
+                update.message.reply_text("🔓 Выход из системы был выполнен. Рассылка уведомлений ✖ остановлена.")
+
         else:
             update.message.reply_text("❌ Вход не был ранее выполнен. Используйте команду /login для входа.")
 
     def __set_commands_menu(self):
         commands = [
-            BotCommand("start", "Запуск бота"),
-            BotCommand("login", "Вход в систему"),
-            BotCommand("logout", "Выход из системы"),
+            BotCommand("start", "▶ Запуск "),
+            BotCommand("login", "🔐 Вход в систему"),
+            BotCommand("logout", "🚪 Выход из системы"),
         ]
 
         self.updater.bot.set_my_commands(commands)
@@ -147,8 +157,12 @@ class PumpingStationsTelegramBot:
             ConversationHandler(
                 entry_points=[CommandHandler("login", self.__login_command)],
                 states={
-                    WAITING_FOR_LOGIN: [MessageHandler(Filters.text & ~Filters.command, self.__receive_login)],
-                    WAITING_FOR_PASSWORD: [MessageHandler(Filters.text & ~Filters.command, self.__receive_password)],
+                    LoginConversationalStates.WAITING_FOR_LOGIN: [
+                        MessageHandler(Filters.text & ~Filters.command, self.__receive_login)
+                    ],
+                    LoginConversationalStates.WAITING_FOR_PASSWORD: [
+                        MessageHandler(Filters.text & ~Filters.command, self.__receive_password)
+                    ],
                 },
                 fallbacks=[CommandHandler("cancel", self.__cancel_command)],
             )

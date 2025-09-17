@@ -1,13 +1,13 @@
 {
-    "workers":[
+    "workers": [
         {
-            "name": "pumping_station_state_watcher",
-            "interval": 20,
+            "name": "pumping_station_telegram_bot_agent_launcher",
+            "interval": 2,
             "immediately": true
         },
         {
-            "name": "pumping_station_telegram_bot_launcher",
-            "interval": 2,
+            "name": "pumping_station_state_watcher",
+            "interval": 20,
             "immediately": true
         }
     ]
