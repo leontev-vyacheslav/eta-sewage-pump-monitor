@@ -9,5 +9,5 @@ def pumping_station_telegram_bot_agent_launcher(app: FlaskEx, interval: float, i
 
     try:
         app.pumping_stations_telegram_bot_agent.run()
-    except Exception as e:
-        app.app_logger.error(f"Bot crashed: {e}")
+    except Exception as exc:
+        app.app_logger.error(f"The pumping stations telegram bot agent crashed: {exc}")

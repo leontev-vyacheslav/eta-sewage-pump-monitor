@@ -141,7 +141,7 @@ class PumpingStationsTelegramBotAgent:
 
     def __set_commands_menu(self):
         commands = [
-            BotCommand("start", "▶ Запуск "),
+            BotCommand("start", "🚀 Запуск "),
             BotCommand("login", "🔐 Вход в систему"),
             BotCommand("logout", "🚪 Выход из системы"),
         ]
@@ -174,4 +174,4 @@ class PumpingStationsTelegramBotAgent:
         self.app.app_logger.info("Starting the pumping stations telegram bot polling...")
 
         self.updater.start_polling()
-        self.updater.idle()
+        # self.updater.idle()

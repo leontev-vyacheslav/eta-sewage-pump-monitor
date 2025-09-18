@@ -4,7 +4,7 @@ from models.pumping.tcp_connector_model import TcpConnectorModel
 from models.pumping.pumping_station_state_value_model import PumpingStationStateValueModel
 from models.pumping.pumping_station_state_model import PumpingStationStateModel
 from remote.pumping_station_modbus_registers import PumpingStationModbusRegisters
-
+from exceptions.pumping_station_connection_error import PumpingStationConnectionError
 
 class PumpingStationRemoteClient:
     def __init__(self, connector: TcpConnectorModel):
@@ -51,8 +51,10 @@ class PumpingStationRemoteClient:
                 address=0, count=holding_registers_count
             )
         except Exception as exc:
-            raise Exception(
-                f"Ошибка связи с modbus-устройством по адресу {self._modbus_tcp_client.comm_params.host}: {self._modbus_tcp_client.comm_params.port}"
+            raise PumpingStationConnectionError(
+                message=f"Ошибка связи с modbus-устройством по адресу {self._modbus_tcp_client.comm_params.host}:{self._modbus_tcp_client.comm_params.port}",
+                host=self._modbus_tcp_client.comm_params.host,
+                port=self._modbus_tcp_client.comm_params.port
             ) from exc
 
         pumping_state = PumpingStationStateModel()

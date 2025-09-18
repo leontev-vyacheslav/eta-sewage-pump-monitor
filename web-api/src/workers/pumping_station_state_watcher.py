@@ -3,7 +3,7 @@ from time import sleep
 
 from flask_ex import FlaskEx
 from remote.pumping_station_remote_client import PumpingStationRemoteClient
-
+from exceptions.pumping_station_connection_error import PumpingStationConnectionError
 
 def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bool, lock: Lock):
     if lock is None:
@@ -19,22 +19,32 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
         pumping_station_objects = pumping_stations_settings.pumping_station_objects.items
         account_links = pumping_stations_settings.account_links_pumping_station_objects.items
 
-        for pumping_station in pumping_station_objects:
+        telegram_bot = app.pumping_stations_telegram_bot_agent.updater.bot if app.pumping_stations_telegram_bot_agent.updater else None
+        if not telegram_bot:
+            app.app_logger.warning("The telegram bot is not ready yet!")
+            sleep(interval)
+            continue
 
+        for pumping_station in pumping_station_objects:
             try:
                 with PumpingStationRemoteClient(pumping_station.connector) as pumping_station_remote_client:
-                    pumping_station_state = pumping_station_remote_client.get_state()
-                    pumping_station_account_ids = [
-                        l.account_id for l in account_links if pumping_station.id in l.pumping_station_objects
-                    ]
-                    pumping_station_telegram_ids = [
-                        a.telegram_ids for a in accounts if a.id in pumping_station_account_ids
-                    ]
+                    connection_error = None
+                    try:
+                        pumping_station_state = pumping_station_remote_client.get_state()
+                    except PumpingStationConnectionError as exc:
+                        pumping_station_state = None
+                        connection_error = exc
+
+                    pumping_station_account_ids = [l.account_id for l in account_links if pumping_station.id in l.pumping_station_objects]
+                    pumping_station_telegram_ids = [a.telegram_ids for a in accounts if a.id in pumping_station_account_ids]
 
                     telegram_ids = sum(pumping_station_telegram_ids, [])
-                    telegram_bot = app.pumping_stations_telegram_bot_agent.updater.bot
 
                     for telegram_id in telegram_ids:
+                        if not pumping_station_state:
+                            telegram_bot.send_message(telegram_id, f'❗Ошибка связи с насосной станцией "{pumping_station.description}" ({connection_error.host}:{connection_error.port}).')
+                            continue
+
                         if pumping_station_state.emergency_level:
                             telegram_bot.send_message(
                                 telegram_id,
@@ -48,6 +58,7 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
                                 f'❌ Ошибка насоса 1 на насосной станции "{pumping_station.description}"',
                             )
                         sleep(2)
+
                         if pumping_station_state.fault_pump_2:
                             telegram_bot.send_message(
                                 telegram_id,
