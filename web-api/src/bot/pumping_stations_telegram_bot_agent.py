@@ -1,7 +1,7 @@
 from enum import IntEnum
 import hashlib
-from telegram import BotCommand, Update
-from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters
+from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
 
 from flask_ex import FlaskEx
 
@@ -18,8 +18,15 @@ class PumpingStationsTelegramBotAgent:
 
     def __init__(self, app: FlaskEx, token: str):
         self.app = app
-        self.token = token
         self.updater = None
+
+        self.__token = token
+        self.__commands = [
+            BotCommand("start", "🚀 Запуск"),
+            BotCommand("list", "📄 Список объектов"),
+            BotCommand("login", "🔐 Вход в систему"),
+            BotCommand("logout", "🚪 Выход из системы"),
+        ]
 
     def __start_command(self, update: Update, context: CallbackContext):
         chat_id = update.effective_chat.id
@@ -57,9 +64,7 @@ class PumpingStationsTelegramBotAgent:
         accounts = self.app.get_accounts_settings().accounts
 
         if login not in [a.login for a in accounts.items]:
-            update.message.reply_text(
-                "❌ Пользователь 👤 не найден среди зарегистрированных аккаунтов 👥. Повторите попытку снова."
-            )
+            update.message.reply_text("❌ Пользователь 👤 не найден среди зарегистрированных аккаунтов 👥. Повторите попытку снова.")
 
             return LoginConversationalStates.WAITING_FOR_LOGIN
 
@@ -86,9 +91,7 @@ class PumpingStationsTelegramBotAgent:
 
             del user_states[chat_id]
 
-            update.message.reply_text(
-                f"✅ Вход был успешно выполнен с учетной записью {login}!\n" f"Вы можете получать 💬 уведомления!"
-            )
+            update.message.reply_text(f"✅ Вход был успешно выполнен с учетной записью {login}!\n" f"Вы можете получать 💬 уведомления!")
 
             return ConversationHandler.END
 
@@ -96,16 +99,12 @@ class PumpingStationsTelegramBotAgent:
         attempts_left = 3 - user_states[chat_id]["attempts"]
 
         if attempts_left > 0:
-            update.message.reply_text(
-                f"❌ Неверный 🔑 ПАРОЛЬ. Попыток осталось: {attempts_left}.\nВведите 🔑 ПАРОЛЬ снова:"
-            )
+            update.message.reply_text(f"❌ Неверный 🔑 ПАРОЛЬ. Попыток осталось: {attempts_left}.\nВведите 🔑 ПАРОЛЬ снова:")
 
             return LoginConversationalStates.WAITING_FOR_PASSWORD
 
         del user_states[chat_id]
-        update.message.reply_text(
-            "❌ Слишком много неудачных попыток входа.\nПопытайтесь снова использовать команду /login."
-        )
+        update.message.reply_text("❌ Слишком много неудачных попыток входа.\nПопытайтесь снова использовать команду /login.")
 
         return ConversationHandler.END
 
@@ -134,22 +133,57 @@ class PumpingStationsTelegramBotAgent:
             else:
                 account.telegram_ids.remove(chat_id)
                 self.app.get_accounts_settings_repository().update(current_settings=None)
-                update.message.reply_text("🔓 Выход из системы был выполнен. Рассылка уведомлений ✖ остановлена.")
+                update.message.reply_text("🚪 Выход из системы был выполнен. Рассылка уведомлений ❌ остановлена.")
 
         else:
-            update.message.reply_text("❌ Вход не был ранее выполнен. Используйте команду /login для входа.")
+            update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
+
+    def __get_account_by_chat_id(self, chat_id: str):
+        accounts = self.app.get_accounts_settings().accounts.items
+        account = next((a for a in accounts if chat_id in a.telegram_ids), None)
+
+        return account
+
+    def __list_command(self, update: Update, context: CallbackContext):
+        chat_id = str(update.effective_chat.id)
+        accounts = self.app.get_accounts_settings().accounts
+        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
+
+        if chat_id in user_states:
+            del user_states[chat_id]
+
+        if chat_id in authorized_users_ids:
+            account = self.__get_account_by_chat_id(chat_id)
+            if not account:
+                update.message.reply_text("❌ Учетная запись не найдена!")
+
+            account_link = next((
+                link for link in self.app.get_pumping_stations_settings().account_links_pumping_station_objects.items
+                if link.account_id == account.id
+            ))
+
+            for p in self.app.get_pumping_stations_settings().pumping_station_objects.items:
+                if p.id in account_link.pumping_station_objects:
+                    # keyboard = [
+                    #     [InlineKeyboardButton("Состояние", callback_data=f"/state {p.id}")]
+                    # ]
+                    # reply_markup = InlineKeyboardMarkup(keyboard)
+                    update.message.reply_text(text=f"{p.description}", reply_markup=None)
+        else:
+            update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
 
     def __set_commands_menu(self):
-        commands = [
-            BotCommand("start", "🚀 Запуск "),
-            BotCommand("login", "🔐 Вход в систему"),
-            BotCommand("logout", "🚪 Выход из системы"),
-        ]
+        self.updater.bot.set_my_commands(self.__commands)
 
-        self.updater.bot.set_my_commands(commands)
+    def button_handler(self, update: Update, context: CallbackContext):
+        query = update.callback_query
+        query.answer()
+
+        if query.data.startswith("/state"):
+            update.effective_message.reply_text(f"Getting state {query.data.split()[1]}")
 
     def run(self):
-        self.updater = Updater(self.token, use_context=True)
+        self.updater = Updater(self.__token, use_context=True)
         dispatcher = self.updater.dispatcher
 
         dispatcher.add_handler(CommandHandler("start", self.__start_command))
@@ -157,21 +191,18 @@ class PumpingStationsTelegramBotAgent:
             ConversationHandler(
                 entry_points=[CommandHandler("login", self.__login_command)],
                 states={
-                    LoginConversationalStates.WAITING_FOR_LOGIN: [
-                        MessageHandler(Filters.text & ~Filters.command, self.__receive_login)
-                    ],
-                    LoginConversationalStates.WAITING_FOR_PASSWORD: [
-                        MessageHandler(Filters.text & ~Filters.command, self.__receive_password)
-                    ],
+                    LoginConversationalStates.WAITING_FOR_LOGIN: [MessageHandler(Filters.text & ~Filters.command, self.__receive_login)],
+                    LoginConversationalStates.WAITING_FOR_PASSWORD: [MessageHandler(Filters.text & ~Filters.command, self.__receive_password)],
                 },
                 fallbacks=[CommandHandler("cancel", self.__cancel_command)],
             )
         )
         dispatcher.add_handler(CommandHandler("logout", self.__logout_command))
+        dispatcher.add_handler(CommandHandler("list", self.__list_command))
+        dispatcher.add_handler(CallbackQueryHandler(self.button_handler))
 
         self.__set_commands_menu()
 
         self.app.app_logger.info("Starting the pumping stations telegram bot polling...")
 
         self.updater.start_polling()
-        # self.updater.idle()

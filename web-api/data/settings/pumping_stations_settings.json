@@ -2,7 +2,7 @@
     "pumpingStationObjects": {
         "items": [
             {
-                "id": "1b2210ac-ab3a-466b-a065-1dc2a7abeac3",
+                "id": "1b2210ac",
                 "name": "ГИМС",
                 "description": "Общественное пространство ГИМС",
                 "connector": {
@@ -11,7 +11,7 @@
                 }
             },
             {
-                "id": "ecf4afa2-f878-4541-a156-c4107405fd75",
+                "id": "ecf4afa2",
                 "name": "КНС-1",
                 "description": "Кремлевская набережная, КНС-1",
                 "connector": {
@@ -20,7 +20,7 @@
                 }
             },
             {
-                "id": "d659627e-d6a8-48c8-918e-9f477680a622",
+                "id": "d659627e",
                 "name": "КНС-2",
                 "description": "Кремлевская набережная, КНС-2",
                 "connector": {
@@ -33,12 +33,12 @@
     "accountLinksPumpingStationObjects": {
         "items": [
             {
-                "accountId": "08dd6d2a-2f40-40c6-8c63-b14a840e52ce",
-                "pumpingStationObjects": ["ecf4afa2-f878-4541-a156-c4107405fd75", "1b2210ac-ab3a-466b-a065-1dc2a7abeac3", "d659627e-d6a8-48c8-918e-9f477680a622"]
+                "accountId": "08dd6d2a",
+                "pumpingStationObjects": ["ecf4afa2", "1b2210ac", "d659627e"]
             },
             {
-                "accountId": "bdc0d605-e7b9-4798-9167-65556ca069fb",
-                "pumpingStationObjects": ["1b2210ac-ab3a-466b-a065-1dc2a7abeac3", "d659627e-d6a8-48c8-918e-9f477680a622"]
+                "accountId": "bdc0d605",
+                "pumpingStationObjects": ["1b2210ac", "d659627e"]
             }
         ]
     }

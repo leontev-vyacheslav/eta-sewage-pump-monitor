@@ -9,7 +9,7 @@ import { EmergencyLevel, PumpingStationIcon, StopIcon2 } from '../../../constant
 
 export const PumpingStationSchema = () => {
     const { pumpingStationObjectState } = usePumpingStationPage();
-    const { isXSmall } = useScreenSize();
+    const { isXSmall, isLarge, isXLarge } = useScreenSize();
 
 
     const startStopPumpsHandler = useCallback(() => {
@@ -87,7 +87,7 @@ export const PumpingStationSchema = () => {
         }
     }, [pumpingStationObjectState]);
 
-    const faultPumpHandler = useCallback( ()=> {
+    const faultPumpHandler = useCallback(() => {
         const svgNs = 'http://www.w3.org/2000/svg';
         if (!pumpingStationObjectState) {
             return;
@@ -125,10 +125,23 @@ export const PumpingStationSchema = () => {
 
     }, [pumpingStationObjectState]);
 
+    const getMnemoschemaHeight = useCallback(() => {
+        if (isXSmall) {
+            return 500;
+        } else if (isLarge) {
+            return 550;
+        } else if (isXLarge) {
+            return 600;
+        }
+
+        return 500;
+    }, [isXSmall, isLarge, isXLarge]);
+
     useEffect(() => {
         levelSensorsHandler();
         startStopPumpsHandler();
         faultPumpHandler();
+
     }, [faultPumpHandler, levelSensorsHandler, startStopPumpsHandler]);
 
     return (
@@ -145,7 +158,7 @@ export const PumpingStationSchema = () => {
                         <PumpingStationIcon id='pump2-stop-icon' size={ 30 } color='#804040' />
                         : null}
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 379 638.04" height={ isXSmall ? 500 : 600 } style={ { marginTop: '10px' } }>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 379 638.04" height={ getMnemoschemaHeight() } style={ { marginTop: '10px' } }>
                     <defs>
                         <pattern id="d" data-name="10 lpi 10%" x="0" y="0" width="72" height="72" patternTransform="translate(3206.15 -7921.49) rotate(-45)" patternUnits="userSpaceOnUse" viewBox="0 0 72 72">
                             <g>
