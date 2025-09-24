@@ -1,5 +1,6 @@
 services:
   eta-sewage-pump-monitor-web-api:
+    container_name:  eta-sewage-pump-monitor-web-api
     build:
       context: ./web-api
       dockerfile: Dockerfile.web-api
@@ -10,6 +11,7 @@ services:
       - eta-sewage-pump-monitor-web-api-log:/app/log
 
   eta-sewage-pump-monitor-web-ui:
+    container_name: eta-sewage-pump-monitor-web-ui
     build:
       context: ./web-ui
       dockerfile: Dockerfile.web-ui
