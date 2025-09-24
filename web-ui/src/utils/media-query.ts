@@ -46,7 +46,7 @@ const mediumMedia = window.matchMedia('(min-width: 960px) and (max-width: 1279.9
 const largeMedia = window.matchMedia('(min-width: 1280px )and (max-width: 1919.99px)');
 const xLargeMedia = window.matchMedia('(min-width: 1920px)');
 
-[xSmallMedia, smallMedia, mediumMedia, largeMedia].forEach(media => {
+[xSmallMedia, smallMedia, mediumMedia, largeMedia, xLargeMedia].forEach(media => {
     media.addEventListener('change', e => {
         e.matches && handlers.forEach(handler => handler());
     });

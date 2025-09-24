@@ -3,9 +3,11 @@ FROM node:bullseye AS build
 WORKDIR /app
 COPY . /app/
 
+ARG REACT_APP_WEB_API_PORT=5001
+ENV REACT_APP_WEB_API_PORT=$REACT_APP_WEB_API_PORT
+
 RUN npm install --legacy-peer-deps
 RUN npm run build
-
 
 FROM nginx:alpine AS main
 

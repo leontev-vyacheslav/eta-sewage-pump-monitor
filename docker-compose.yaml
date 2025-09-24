@@ -4,8 +4,10 @@ services:
       context: ./web-api
       dockerfile: Dockerfile.web-api
     ports:
-      - 5000:5000
-
+      - 5001:5000
+    volumes:
+      - eta-sewage-pump-monitor-web-api-data:/app/data
+      - eta-sewage-pump-monitor-web-api-log:/app/log
 
   eta-sewage-pump-monitor-web-ui:
     build:
@@ -13,3 +15,7 @@ services:
       dockerfile: Dockerfile.web-ui
     ports:
       - 3000:80
+
+volumes:
+  eta-sewage-pump-monitor-web-api-data:
+  eta-sewage-pump-monitor-web-api-log:

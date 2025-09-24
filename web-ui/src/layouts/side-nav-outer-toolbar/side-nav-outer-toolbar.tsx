@@ -14,10 +14,10 @@ import './side-nav-outer-toolbar.scss';
 export default function ({ title, children }: SideNavProps) {
     const scrollViewRef = useRef<ScrollView>(null);
     const history = useNavigate();
-    const { isXSmall, isLarge } = useScreenSize();
+    const { isXSmall, isLarge, isXLarge } = useScreenSize();
     const [patchCssClass, onMenuReady] = useMenuPatch();
     const [menuStatus, setMenuStatus] = useState(
-        isLarge ? MenuStatus.Opened : MenuStatus.Closed
+        isLarge || isXLarge ? MenuStatus.Opened : MenuStatus.Closed
     );
 
     const toggleMenu = useCallback(({ event }: ClickEvent) => {
@@ -41,20 +41,20 @@ export default function ({ title, children }: SideNavProps) {
         let result = false;
         setMenuStatus(
             prevMenuStatus => {
-                result = prevMenuStatus !== MenuStatus.Closed && !isLarge;
-                return prevMenuStatus !== MenuStatus.Closed && !isLarge
+                result = prevMenuStatus !== MenuStatus.Closed && !(isLarge || isXLarge);
+                return prevMenuStatus !== MenuStatus.Closed && !(isLarge || isXLarge)
                   ? MenuStatus.Closed
                   : prevMenuStatus;
             }
         );
 
         return result;
-    }, [isLarge]);
+    }, [isLarge, isXLarge]);
 
 
     const onNavigationChanged = useCallback(({ itemData: { path }, event, node }) => {
 
-        if (!isLarge || menuStatus === MenuStatus.TemporaryOpened) {
+        if (!(isLarge || isXLarge) || menuStatus === MenuStatus.TemporaryOpened) {
             setMenuStatus(MenuStatus.Closed);
             event.stopPropagation();
         }
@@ -64,7 +64,7 @@ export default function ({ title, children }: SideNavProps) {
             return;
         }
 
-        if (!isLarge || menuStatus === MenuStatus.TemporaryOpened) {
+        if (!(isLarge || isXLarge) || menuStatus === MenuStatus.TemporaryOpened) {
             setMenuStatus(MenuStatus.Closed);
             event.stopPropagation();
         }
@@ -74,7 +74,7 @@ export default function ({ title, children }: SideNavProps) {
             scrollViewRef.current?.instance.scrollTo(0);
         }, 100);
 
-    }, [history, menuStatus, isLarge]);
+    }, [history, menuStatus, isLarge, isXLarge]);
 
     return (
         <div className={ 'side-nav-outer-toolbar' }>
@@ -87,11 +87,11 @@ export default function ({ title, children }: SideNavProps) {
                 className={ ['drawer', patchCssClass].join(' ') }
                 position={ 'before' }
                 closeOnOutsideClick={ onOutsideClick }
-                openedStateMode={ isLarge ? 'shrink' : 'overlap' }
+                openedStateMode={ isLarge || isXLarge ? 'shrink' : 'overlap' }
                 revealMode={ isXSmall ? 'slide' : 'expand' }
                 minSize={ isXSmall ? 0 : 45 }
                 maxSize={ 250 }
-                shading={ !isLarge }
+                shading={ !(isLarge || isXLarge) }
                 opened={ menuStatus !== MenuStatus.Closed }
                 template={ 'menu' }
             >

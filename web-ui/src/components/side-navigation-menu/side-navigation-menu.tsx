@@ -20,7 +20,7 @@ export default function SideNavigationMenu(props: SideNavigationMenuProps) {
         onMenuReady
     } = props;
 
-    const { isLarge } = useScreenSize();
+    const { isLarge, isXLarge } = useScreenSize();
     const { signOutWithConfirm, treeViewRef } = useSharedArea();
     const { showWorkDatePicker } = useWorkdatePicker();
     const { navigationData: { currentPath } } = useNavigation();
@@ -37,11 +37,11 @@ export default function SideNavigationMenu(props: SideNavigationMenuProps) {
                         item.path = `/${item.path}`;
                     }
 
-                    return { ...item, expanded: isLarge } as TreeViewItemModel
+                    return { ...item, expanded: isLarge || isXLarge } as TreeViewItemModel
                 });
         },
 
-        [isLarge, sideNavigationMenuItems]
+        [isLarge, isXLarge, sideNavigationMenuItems]
     );
 
     const getWrapperRef = useCallback((element) => {
