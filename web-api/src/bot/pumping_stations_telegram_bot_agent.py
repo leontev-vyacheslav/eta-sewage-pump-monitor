@@ -1,6 +1,6 @@
 from enum import IntEnum
 import hashlib
-from telegram import BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import BotCommand, Update
 from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
 
 from flask_ex import FlaskEx
@@ -157,17 +157,12 @@ class PumpingStationsTelegramBotAgent:
             if not account:
                 update.message.reply_text("❌ Учетная запись не найдена!")
 
-            account_link = next((
-                link for link in self.app.get_pumping_stations_settings().account_links_pumping_station_objects.items
-                if link.account_id == account.id
-            ))
+            account_link = next(
+                (link for link in self.app.get_pumping_stations_settings().account_links_pumping_station_objects.items if link.account_id == account.id)
+            )
 
             for p in self.app.get_pumping_stations_settings().pumping_station_objects.items:
                 if p.id in account_link.pumping_station_objects:
-                    # keyboard = [
-                    #     [InlineKeyboardButton("Состояние", callback_data=f"/state {p.id}")]
-                    # ]
-                    # reply_markup = InlineKeyboardMarkup(keyboard)
                     update.message.reply_text(text=f"{p.description}", reply_markup=None)
         else:
             update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")

@@ -48,7 +48,7 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
                         if pumping_station_state.emergency_level:
                             telegram_bot.send_message(
                                 telegram_id,
-                                f'⚠️ Достигнут аварийный уровень на насосной станции "{pumping_station.description}"',
+                                f'⚠️ Превышен предельно допустимый уровень на насосной станции "{pumping_station.description}"',
                             )
                         sleep(2)
 

@@ -41,7 +41,7 @@ function PumpingStationPageContextProvider(props: any) {
             if (pumpingStationObjectState.emergencyLevel) {
                 proclaim({
                     type: 'warning',
-                    message: 'Достигнут аварийный уровень жидкости!',
+                    message: 'Превышен предельно допустимый уровень!',
                     displayTime: 5000,
                 });
             }
