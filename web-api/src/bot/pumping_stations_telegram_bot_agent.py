@@ -1,9 +1,12 @@
+#pylint: disable=unused-argument
+from typing import Callable
 from enum import IntEnum
 import hashlib
 from telegram import BotCommand, Update
-from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackContext, MessageHandler, Filters
 
 from flask_ex import FlaskEx
+from models.common.account_model import AccountModel, TelegramAccountModel
 
 
 class LoginConversationalStates(IntEnum):
@@ -23,19 +26,21 @@ class PumpingStationsTelegramBotAgent:
         self.__token = token
         self.__commands = [
             BotCommand("start", "🚀 Запуск"),
-            BotCommand("list", "📄 Список объектов"),
             BotCommand("login", "🔐 Вход в систему"),
             BotCommand("logout", "🚪 Выход из системы"),
+            BotCommand("unmute", "🔔 Включить уведомления"),
+            BotCommand("mute", "🔕 Отключить уведомления"),
+            BotCommand("states", "🗂️ Состояние объектов"),
         ]
 
     def __start_command(self, update: Update, context: CallbackContext):
         chat_id = update.effective_chat.id
 
         accounts = self.app.get_accounts_settings().accounts
-        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
+        authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
 
-        if chat_id in authorized_users_ids:
-            account = next((a for a in accounts.items if chat_id in a.telegram_ids), None)
+        if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
+            account = next((a for a in accounts.items if chat_id in [ta.chat_id for ta in a.telegram_accounts]), None)
             update.message.reply_text(f"✅ Вы уже были раннее авторизованы c учетной записью {account.login}!")
         else:
             update.message.reply_text("🔐 Выполните вход используя команду /login.")
@@ -44,10 +49,10 @@ class PumpingStationsTelegramBotAgent:
         chat_id = str(update.effective_chat.id)
         accounts = self.app.get_accounts_settings().accounts
 
-        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
+        authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
 
-        if chat_id in authorized_users_ids:
-            account = next((a for a in accounts.items if chat_id in a.telegram_ids), None)
+        if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
+            account = next((a for a in accounts.items if chat_id in [ta.chat_id for ta in a.telegram_accounts]), None)
             update.message.reply_text(f"✅ Вы уже были раннее авторизованы c учетной записью {account.login}!")
 
             return ConversationHandler.END
@@ -86,7 +91,8 @@ class PumpingStationsTelegramBotAgent:
         account = next((a for a in accounts.items if a.login == login))
 
         if account.password == password_hash:
-            account.telegram_ids.append(str(chat_id))
+            account.telegram_accounts.append(TelegramAccountModel(chat_id=str(chat_id), mute=False))
+
             self.app.get_accounts_settings_repository().update(current_settings=None)
 
             del user_states[chat_id]
@@ -118,41 +124,21 @@ class PumpingStationsTelegramBotAgent:
 
         return ConversationHandler.END
 
-    def __logout_command(self, update: Update, context: CallbackContext):
-        chat_id = str(update.effective_chat.id)
-        accounts = self.app.get_accounts_settings().accounts
-        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
-
-        if chat_id in user_states:
-            del user_states[chat_id]
-
-        if chat_id in authorized_users_ids:
-            account = next((a for a in accounts.items if chat_id in a.telegram_ids), None)
-            if account is None:
-                update.message.reply_text("❌ Учетная запись не найдена.")
-            else:
-                account.telegram_ids.remove(chat_id)
-                self.app.get_accounts_settings_repository().update(current_settings=None)
-                update.message.reply_text("🚪 Выход из системы был выполнен. Рассылка уведомлений ❌ остановлена.")
-
-        else:
-            update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
-
     def __get_account_by_chat_id(self, chat_id: str):
         accounts = self.app.get_accounts_settings().accounts.items
-        account = next((a for a in accounts if chat_id in a.telegram_ids), None)
+        account = next((a for a in accounts if chat_id in [ta.chat_id for ta in a.telegram_accounts]), None)
 
         return account
 
-    def __list_command(self, update: Update, context: CallbackContext):
+    def __states_command(self, update: Update, context: CallbackContext):
         chat_id = str(update.effective_chat.id)
         accounts = self.app.get_accounts_settings().accounts
-        authorized_users_ids = sum([a.telegram_ids for a in accounts.items], [])
+        authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
 
         if chat_id in user_states:
             del user_states[chat_id]
 
-        if chat_id in authorized_users_ids:
+        if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
             account = self.__get_account_by_chat_id(chat_id)
             if not account:
                 update.message.reply_text("❌ Учетная запись не найдена!")
@@ -167,15 +153,57 @@ class PumpingStationsTelegramBotAgent:
         else:
             update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
 
+    def __core_authorized_command(self, update: Update, callback: Callable[[AccountModel, TelegramAccountModel], None]):
+        chat_id = str(update.effective_chat.id)
+        accounts = self.app.get_accounts_settings().accounts
+        authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
+
+
+        if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
+            account = next((a for a in accounts.items if chat_id in [ta.chat_id for ta in a.telegram_accounts]), None)
+            if account is None:
+                update.message.reply_text("❌ Учетная запись не найдена.")
+            else:
+                telegram_account = next((ta for ta in account.telegram_accounts if ta.chat_id == chat_id), None)
+                if telegram_account is None:
+                    update.message.reply_text("❌ Учетная запись не найдена.")
+                    return
+
+                callback(account=account, telegram_account=telegram_account)
+        else:
+            update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
+
+    def __logout_command(self, update: Update, context: CallbackContext):
+        def callback(account: AccountModel, telegram_account: TelegramAccountModel):
+            if telegram_account.chat_id in user_states:
+                del user_states[telegram_account.chat_id]
+
+            account = self.__get_account_by_chat_id(telegram_account.chat_id)
+            account.telegram_accounts = [ta for ta in account.telegram_accounts if ta.chat_id != telegram_account.chat_id]
+            self.app.get_accounts_settings_repository().update(current_settings=None)
+            update.message.reply_text("🚪 Выход из системы был выполнен. Рассылка уведомлений ❌ остановлена.")
+
+        self.__core_authorized_command(update=update, callback=callback)
+
+    def __unmute_command(self, update: Update, context: CallbackContext):
+        def callback(account: AccountModel, telegram_account: TelegramAccountModel):
+            telegram_account.mute = False
+            self.app.get_accounts_settings_repository().update(current_settings=None)
+
+            update.message.reply_text("🔔 Рассылка уведомлений включена.")
+
+        self.__core_authorized_command(update=update, callback=callback)
+
+    def __mute_command(self, update: Update, context: CallbackContext):
+        def callback(account: AccountModel,telegram_account: TelegramAccountModel):
+            telegram_account.mute = True
+            self.app.get_accounts_settings_repository().update(current_settings=None)
+            update.message.reply_text("🔕 Рассылка уведомлений выключена.")
+
+        self.__core_authorized_command(update=update, callback=callback)
+
     def __set_commands_menu(self):
         self.updater.bot.set_my_commands(self.__commands)
-
-    def button_handler(self, update: Update, context: CallbackContext):
-        query = update.callback_query
-        query.answer()
-
-        if query.data.startswith("/state"):
-            update.effective_message.reply_text(f"Getting state {query.data.split()[1]}")
 
     def run(self):
         self.updater = Updater(self.__token, use_context=True)
@@ -193,8 +221,10 @@ class PumpingStationsTelegramBotAgent:
             )
         )
         dispatcher.add_handler(CommandHandler("logout", self.__logout_command))
-        dispatcher.add_handler(CommandHandler("list", self.__list_command))
-        dispatcher.add_handler(CallbackQueryHandler(self.button_handler))
+        dispatcher.add_handler(CommandHandler("states", self.__states_command))
+
+        dispatcher.add_handler(CommandHandler("unmute", self.__unmute_command))
+        dispatcher.add_handler(CommandHandler("mute", self.__mute_command))
 
         self.__set_commands_menu()
 

@@ -6,9 +6,15 @@
                 "role": 1,
                 "login": "Admin",
                 "password": "17756315ebd47b7110359fc7b168179bf6f2df3646fcc888bc8aa05c78b38ac1",
-                "telegramIds": [
-                    "5467557669",
-                    "965648301"
+                "telegramAccounts": [
+                    {
+                        "chatId": "5467557669",
+                        "mute": false
+                    },
+                    {
+                        "chatId": "965648301",
+                        "mute": false
+                    }
                 ]
             },
             {
@@ -16,7 +22,7 @@
                 "role": 2,
                 "login": "Operator",
                 "password": "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646",
-                "telegramIds": []
+                "telegramAccounts": []
             }
         ]
     }

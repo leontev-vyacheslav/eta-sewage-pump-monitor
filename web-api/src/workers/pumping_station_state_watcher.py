@@ -36,11 +36,11 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
                         connection_error = exc
 
                     pumping_station_account_ids = [l.account_id for l in account_links if pumping_station.id in l.pumping_station_objects]
-                    pumping_station_telegram_ids = [a.telegram_ids for a in accounts if a.id in pumping_station_account_ids]
+                    pumping_station_telegram_accounts = [a.telegram_accounts for a in accounts if a.id in pumping_station_account_ids]
 
-                    telegram_ids = sum(pumping_station_telegram_ids, [])
+                    telegram_accounts = sum(pumping_station_telegram_accounts, [])
 
-                    for telegram_id in telegram_ids:
+                    for telegram_id in [ta.chat_id for ta in telegram_accounts if not ta.mute]:
                         if not pumping_station_state:
                             telegram_bot.send_message(telegram_id, f'❗Ошибка связи с насосной станцией "{pumping_station.description}" ({connection_error.host}:{connection_error.port}).')
                             continue

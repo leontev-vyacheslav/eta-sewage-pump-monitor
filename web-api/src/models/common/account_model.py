@@ -3,6 +3,12 @@ from models.abstracts.app_base_model import AppBaseModel
 from models.common.enums.user_role_model import UserRoleModel
 
 
+class TelegramAccountModel(AppBaseModel):
+    chat_id: str
+
+    mute: bool
+
+
 class AccountModel(AppBaseModel):
     id: str
 
@@ -12,7 +18,7 @@ class AccountModel(AppBaseModel):
 
     password: str
 
-    telegram_ids: List[str]
+    telegram_accounts: List[TelegramAccountModel]
 
 
 class ExtendedAccountModel(AccountModel):
