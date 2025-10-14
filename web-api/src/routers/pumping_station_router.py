@@ -64,6 +64,7 @@ def post_state_value(pumping_station_id: str, body: PumpingStationStateValueMode
         return MessageModel(message=f"Объект насосной станции {pumping_station_id} не найден"), HTTPStatus.NOT_FOUND
 
     body.prop_name = to_snake(body.prop_name)
+
     with PumpingStationRemoteClient(pumping_station_object.connector) as pumping_station_remote_client:
         pdu = pumping_station_remote_client.set_state_value(body)
         if pdu.isError():
@@ -72,4 +73,4 @@ def post_state_value(pumping_station_id: str, body: PumpingStationStateValueMode
                 HTTPStatus.BAD_REQUEST,
             )
 
-        return body, HTTPStatus.OK
+    return body, HTTPStatus.OK

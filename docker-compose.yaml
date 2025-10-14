@@ -16,7 +16,7 @@ services:
       context: ./web-ui
       dockerfile: Dockerfile.web-ui
     ports:
-      - 3000:80
+      - 3000:80 
 
 volumes:
   eta-sewage-pump-monitor-web-api-data:
