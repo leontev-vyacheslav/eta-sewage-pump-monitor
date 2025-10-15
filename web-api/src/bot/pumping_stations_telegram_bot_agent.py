@@ -1,4 +1,4 @@
-#pylint: disable=unused-argument
+# pylint: disable=unused-argument
 from typing import Callable
 from enum import IntEnum
 import hashlib
@@ -7,6 +7,8 @@ from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackC
 
 from flask_ex import FlaskEx
 from models.common.account_model import AccountModel, TelegramAccountModel
+from remote.pumping_station_remote_client import PumpingStationRemoteClient
+from lockers import worker_thread_locks
 
 
 class LoginConversationalStates(IntEnum):
@@ -26,11 +28,11 @@ class PumpingStationsTelegramBotAgent:
         self.__token = token
         self.__commands = [
             BotCommand("start", "🚀 Запуск"),
+            BotCommand("states", "🗂️ Состояние объектов"),
             BotCommand("login", "🔐 Вход в систему"),
             BotCommand("logout", "🚪 Выход из системы"),
             BotCommand("unmute", "🔔 Включить уведомления"),
             BotCommand("mute", "🔕 Отключить уведомления"),
-            BotCommand("states", "🗂️ Состояние объектов"),
         ]
 
     def __start_command(self, update: Update, context: CallbackContext):
@@ -130,34 +132,10 @@ class PumpingStationsTelegramBotAgent:
 
         return account
 
-    def __states_command(self, update: Update, context: CallbackContext):
-        chat_id = str(update.effective_chat.id)
-        accounts = self.app.get_accounts_settings().accounts
-        authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
-
-        if chat_id in user_states:
-            del user_states[chat_id]
-
-        if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
-            account = self.__get_account_by_chat_id(chat_id)
-            if not account:
-                update.message.reply_text("❌ Учетная запись не найдена!")
-
-            account_link = next(
-                (link for link in self.app.get_pumping_stations_settings().account_links_pumping_station_objects.items if link.account_id == account.id)
-            )
-
-            for p in self.app.get_pumping_stations_settings().pumping_station_objects.items:
-                if p.id in account_link.pumping_station_objects:
-                    update.message.reply_text(text=f"{p.description}", reply_markup=None)
-        else:
-            update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
-
     def __core_authorized_command(self, update: Update, callback: Callable[[AccountModel, TelegramAccountModel], None]):
         chat_id = str(update.effective_chat.id)
         accounts = self.app.get_accounts_settings().accounts
         authorized_telegram_accounts = sum([a.telegram_accounts for a in accounts.items], [])
-
 
         if chat_id in [telegram_account.chat_id for telegram_account in authorized_telegram_accounts]:
             account = next((a for a in accounts.items if chat_id in [ta.chat_id for ta in a.telegram_accounts]), None)
@@ -172,6 +150,74 @@ class PumpingStationsTelegramBotAgent:
                 callback(account=account, telegram_account=telegram_account)
         else:
             update.message.reply_text("❌ Вход еще не был ранее выполнен. Используйте сначала команду /login для входа.")
+
+    def __states_command(self, update: Update, context: CallbackContext):
+
+        def callback(account: AccountModel, telegram_account: TelegramAccountModel):
+            account_link = next(
+                (link for link in self.app.get_pumping_stations_settings().account_links_pumping_station_objects.items if link.account_id == account.id)
+            )
+            pumping_station_state_watcher_lock = worker_thread_locks.get("pumping_station_state_watcher_lock", None)
+            if pumping_station_state_watcher_lock is None:
+                update.message.reply_text("❌ Сервис проверки состояния насосных станций не доступен.")
+                return
+
+            with pumping_station_state_watcher_lock:
+                pumping_station_objects = [
+                    p for p in self.app.get_pumping_stations_settings().pumping_station_objects.items if p.id in account_link.pumping_station_objects
+                ]
+                update.message.reply_text(f"▶️ Начало опроса насосных станций ({len(pumping_station_objects)})...")
+
+                for p in pumping_station_objects:
+                    try:
+                        with PumpingStationRemoteClient(p.connector) as pumping_station_remote_client:
+                            s = pumping_station_remote_client.get_state()
+
+                            level = "⚠️ Неизвестно"
+                            level = "✅ Нижний" if s.low_level else level
+                            level = "✅ Средний" if s.mid_level else level
+                            level = "✋ Высокий" if s.hi_level else level
+                            level = "❌ Аварийный" if s.emergency_level else level
+
+                            if s.state_pump_1 and not s.fault_pump_1:
+                                state_pump_1 = "✅ Работает"
+                            elif not s.state_pump_1 and s.fault_pump_1:
+                                state_pump_1 = "❌ Неисправен"
+                            elif not s.state_pump_1 and not s.fault_pump_1:
+                                state_pump_1 = "🛑 Не работает"
+                            else:
+                                state_pump_1 = "⚠️ Неизвестно"
+
+                            if s.state_pump_2 and not s.fault_pump_2:
+                                state_pump_2 = "✅ Работает"
+                            elif not s.state_pump_2 and s.fault_pump_2:
+                                state_pump_2 = "❌ Неисправен"
+                            elif not s.state_pump_2 and not s.fault_pump_2:
+                                state_pump_2 = "🛑 Не работает"
+                            else:
+                                state_pump_2 = "⚠️ Неизвестно"
+
+                            update.message.reply_text(
+                                "<pre>"
+                                f"{p.description}\n"
+                                "\n"
+                                "Параметр               Значение\n"
+                                "-------------------------------\n"
+                                f"Уровень:              {level}\n"
+                                f"Состояние насоса 1:   {state_pump_1}\n"
+                                f"Состояние насоса 2:   {state_pump_2}\n"
+                                f"Вр. нараб. насоса 1:  ⏳ {s.time_pump_1} ч.\n"
+                                f"Вр. нараб. насоса 2:  ⏳ {s.time_pump_2} ч.\n"
+                                "</pre>",
+                                parse_mode="HTML",
+                            )
+                    except Exception as exc:
+                        update.message.reply_text(text=f"❌ Ошибка получения состояния объекта {p.name}: {str(exc)}", reply_markup=None)
+                        continue
+
+                update.message.reply_text("⏹️ Окончание опроса насосных станций.")
+
+        self.__core_authorized_command(update=update, callback=callback)
 
     def __logout_command(self, update: Update, context: CallbackContext):
         def callback(account: AccountModel, telegram_account: TelegramAccountModel):
@@ -195,7 +241,7 @@ class PumpingStationsTelegramBotAgent:
         self.__core_authorized_command(update=update, callback=callback)
 
     def __mute_command(self, update: Update, context: CallbackContext):
-        def callback(account: AccountModel,telegram_account: TelegramAccountModel):
+        def callback(account: AccountModel, telegram_account: TelegramAccountModel):
             telegram_account.mute = True
             self.app.get_accounts_settings_repository().update(current_settings=None)
             update.message.reply_text("🔕 Рассылка уведомлений выключена.")

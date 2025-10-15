@@ -7,9 +7,9 @@ from remote.pumping_station_modbus_registers import PumpingStationModbusRegister
 from exceptions.pumping_station_connection_error import PumpingStationConnectionError
 
 class PumpingStationRemoteClient:
-    def __init__(self, connector: TcpConnectorModel):
+    def __init__(self, connector: TcpConnectorModel, timeout: int = 3):
 
-        self._modbus_tcp_client = ModbusTcpClient(host=connector.host, port=connector.port)
+        self._modbus_tcp_client = ModbusTcpClient(host=connector.host, port=connector.port, timeout=timeout)
 
     def __enter__(self):
         self._modbus_tcp_client.connect()
