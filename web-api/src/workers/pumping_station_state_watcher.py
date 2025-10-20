@@ -9,6 +9,8 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
     if lock is None:
         raise Exception("The thread lock of the pumping station state watcher wasn't found.")
 
+    pooling_pause = 1.0
+
     while True:
         if not immediately:
             sleep(interval)
@@ -51,26 +53,26 @@ def pumping_station_state_watcher(app: FlaskEx, interval: float, immediately: bo
                                     telegram_id,
                                     f'⚠️ Превышен предельно допустимый уровень на насосной станции "{pumping_station.description}"',
                                 )
-                            sleep(2)
+                            sleep(pooling_pause)
 
                             if pumping_station_state.fault_pump_1:
                                 telegram_bot.send_message(
                                     telegram_id,
                                     f'❌ Ошибка насоса 1 на насосной станции "{pumping_station.description}"',
                                 )
-                            sleep(2)
+                            sleep(pooling_pause)
 
                             if pumping_station_state.fault_pump_2:
                                 telegram_bot.send_message(
                                     telegram_id,
                                     f'❌ Ошибка насоса 2 на насосной станции "{pumping_station.description}"',
                                 )
-                            sleep(2)
+                            sleep(pooling_pause)
 
                 except Exception as exc:
                     app.app_logger.error(exc)
 
-                sleep(2)
+                sleep(pooling_pause)
 
         app.app_logger.info("The pumping station state watcher has finished its notification cycle.")
 

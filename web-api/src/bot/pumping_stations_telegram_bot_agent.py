@@ -198,9 +198,8 @@ class PumpingStationsTelegramBotAgent:
                                 state_pump_2 = "⚠️ Неизвестно"
 
                             update.message.reply_text(
+                                f"🏢 <b>{p.description} {"✅" if s.start_stop else "🛑"}</b>\n" +
                                 "<pre>"
-                                f"{p.description}\n"
-                                "\n"
                                 "Параметр               Значение\n"
                                 "-------------------------------\n"
                                 f"Уровень:              {level}\n"

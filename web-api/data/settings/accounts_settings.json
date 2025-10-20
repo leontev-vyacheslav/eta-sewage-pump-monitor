@@ -10,10 +10,6 @@
                     {
                         "chatId": "5467557669",
                         "mute": false
-                    },
-                    {
-                        "chatId": "965648301",
-                        "mute": false
                     }
                 ]
             },
@@ -22,7 +18,12 @@
                 "role": 2,
                 "login": "Operator",
                 "password": "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646",
-                "telegramAccounts": []
+                "telegramAccounts": [
+                    {
+                        "chatId": "965648301",
+                        "mute": false
+                    }
+                ]
             }
         ]
     }

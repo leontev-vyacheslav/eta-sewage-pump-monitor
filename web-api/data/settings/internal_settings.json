@@ -7,7 +7,7 @@
         },
         {
             "name": "pumping_station_state_watcher",
-            "interval": 20,
+            "interval": 30,
             "immediately": true
         }
     ]

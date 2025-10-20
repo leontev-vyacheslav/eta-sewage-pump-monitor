@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import moment from 'moment';
 import { AppSettingsContextModel, AppSettingsDataContextModel } from '../models/app-settings-context';
 import { AppBaseProviderProps } from '../models/app-base-provider-props';
-import { useAppData } from './app-data/app-data';
 
 const AppSettingsContext = createContext<AppSettingsContextModel>({} as AppSettingsContextModel);
 

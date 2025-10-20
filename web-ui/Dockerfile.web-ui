@@ -1,4 +1,4 @@
-FROM node:bullseye AS build
+FROM node AS build
 
 WORKDIR /app
 COPY . /app/

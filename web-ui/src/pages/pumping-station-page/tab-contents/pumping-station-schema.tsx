@@ -127,7 +127,7 @@ export const PumpingStationSchema = () => {
 
     const getMnemoschemaHeight = useCallback(() => {
         if (isXSmall) {
-            return 500;
+            return 450;
         } else if (isLarge) {
             return 550;
         } else if (isXLarge) {

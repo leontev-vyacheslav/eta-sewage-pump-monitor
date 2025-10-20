@@ -27,6 +27,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:mobile": "HOST=0.0.0.0 npm start",
     "reinstall": "yarn install",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=6144 react-scripts build",
     "build-themes": "devextreme build",
